@@ -85,8 +85,8 @@ public class Robot extends TimedRobot {
     private static final int ROTATION_AXIS_OPENTX = 3;
     private static final boolean ZERO_IS_AXIS = true;
     
-    private static final int TRANS_X_AXIS_XBOX = 0;
-    private static final int TRANS_Y_AXIS_XBOX = 1;
+    private static final int TRANS_X_AXIS_XBOX = 1;
+    private static final int TRANS_Y_AXIS_XBOX = 0;
     private static final int THROTTLE_AXIS_XBOX = 5;
     private static final int ROTATION_AXIS_XBOX = 4;
     private static final int DPAD_AXIS_XBOX = 0;
@@ -243,7 +243,8 @@ public class Robot extends TimedRobot {
             double yVelocity = networkTables.getLinearYCmd();
             double rotationSpeed = networkTables.getAngularZCmd();
 
-            targetState = targetState.changeTranslationVelocity(new Vector2D(xVelocity, yVelocity));
+            // TODO: figure out why X and Y are flipped
+            targetState = targetState.changeTranslationVelocity(new Vector2D(-yVelocity, xVelocity));
             targetState = targetState.changeRotationVelocity(rotationSpeed);
 
             chassis.setTargetState(targetState);
@@ -303,7 +304,7 @@ public class Robot extends TimedRobot {
 
     private MotionState joystickUpdateXbox(MotionState targetState)
     {
-        double vx_joy_val = gamepad.getRawAxis(TRANS_X_AXIS_XBOX);
+        double vx_joy_val = -gamepad.getRawAxis(TRANS_X_AXIS_XBOX);
         double vy_joy_val = -gamepad.getRawAxis(TRANS_Y_AXIS_XBOX);
 
         double vt_joy_val = -gamepad.getRawAxis(ROTATION_AXIS_XBOX);
@@ -336,7 +337,8 @@ public class Robot extends TimedRobot {
         //     "\tt: " + vt_joy_val
         // );
         
-        targetState = targetState.changeTranslationVelocity(new Vector2D(vx_joy_val, vy_joy_val));
+        // TODO: figure out why X and Y are flipped
+        targetState = targetState.changeTranslationVelocity(new Vector2D(-vy_joy_val, vx_joy_val));
         targetState = targetState.changeRotationVelocity(vt_joy_val);
 
         return targetState;
