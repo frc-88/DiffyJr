@@ -35,6 +35,7 @@ import frc.team88.swerve.util.WrappedAngle;
 import frc.team88.swerve.util.constants.Constants;
 import frc.team88.swerve.util.constants.DoublePreferenceConstant;
 import frc.team88.swerve.util.constants.PIDPreferenceConstants;
+import frc.team88.swerve.util.logging.DataLogger;
 import frc.team88.swerve.wrappers.gyro.NavX;
 import frc.team88.swerve.networking.SwerveNetworkTables;
 
@@ -86,6 +87,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+        // Initialize data logging
+        DataLogger.initialize();
+        
         // Initialize the PID constants
         motorSpeedPIDConstants = new PIDPreferenceConstants("Motor Speed", 0, 0.00000035, 0, 0.00019, 150, 0, 0);
         azimuthPositionPIDConstants = new PIDPreferenceConstants("Azimuth Position", 8.5, 0, 0.15, 0, 0, 0, 0);
@@ -191,6 +195,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
+        DataLogger.getInstance().logData();
+        
         if (gamepad.getRawButton(7)) {
             // OOOOOOOH, I WONDER WHAT THIS DOES!
             // int infiniteTJSquareds = 88 / 0;
