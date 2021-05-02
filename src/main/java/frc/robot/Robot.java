@@ -77,12 +77,25 @@ public class Robot extends TimedRobot {
     private WrappedAngle translationAngle = new WrappedAngle(0);
 
     private SwerveNetworkTables networkTables;
-    private static final int TRANS_X_AXIS = 1;
-    private static final int TRANS_Y_AXIS = 2;
+
     private static final int INVERT_TRANS_Y = 1;
-    private static final int THROTTLE_AXIS = 0;
-    private static final int ROTATION_AXIS = 3;
+    private static final int TRANS_X_AXIS_OPENTX = 1;
+    private static final int TRANS_Y_AXIS_OPENTX = 2;
+    private static final int THROTTLE_AXIS_OPENTX = 0;
+    private static final int ROTATION_AXIS_OPENTX = 3;
     private static final boolean ZERO_IS_AXIS = true;
+    
+    private static final int TRANS_X_AXIS_XBOX = 0;
+    private static final int TRANS_Y_AXIS_XBOX = 1;
+    private static final int THROTTLE_AXIS_XBOX = 5;
+    private static final int ROTATION_AXIS_XBOX = 4;
+    private static final int DPAD_AXIS_XBOX = 0;
+    private static final double XBOX_JOYSTICK_DEADZONE = 0.07;
+
+    private double speedCapXbox = MAX_SPEED / 5.0;
+    private double rotationCapXbox = MAX_ROTATION / 5.0;
+    private int speedCapIndexXbox = 0;
+    private int prevDpadValXbox = -1;
 
     @Override
     public void robotInit() {
@@ -187,6 +200,8 @@ public class Robot extends TimedRobot {
         gamepad = new Joystick(0);
 
         networkTables = new SwerveNetworkTables(chassis);
+
+        chassis.setRobotCentic();
     }
 
     @Override
@@ -270,38 +285,142 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void teleopPeriodic() {
+    public void teleopPeriodic() { 
+        // The target motion state to set
+        MotionState targetState = chassis.getTargetState();
+
+        // targetState = joystickUpdateOpenTX(targetState);
+        targetState = joystickUpdateXbox(targetState);
+
+        if (!network_table_cmd_active) {
+            // Set the target state
+            chassis.setTargetState(targetState);
+
+            // Update the chassis
+            chassis.update();
+        }
+    }
+
+    private MotionState joystickUpdateXbox(MotionState targetState)
+    {
+        double vx_joy_val = gamepad.getRawAxis(TRANS_X_AXIS_XBOX);
+        double vy_joy_val = -gamepad.getRawAxis(TRANS_Y_AXIS_XBOX);
+
+        double vt_joy_val = -gamepad.getRawAxis(ROTATION_AXIS_XBOX);
+
+        if (Math.abs(vx_joy_val) < XBOX_JOYSTICK_DEADZONE) {
+            vx_joy_val = 0.0;
+        }
+        if (Math.abs(vy_joy_val) < XBOX_JOYSTICK_DEADZONE) {
+            vy_joy_val = 0.0;
+        }
+        if (Math.abs(vt_joy_val) < XBOX_JOYSTICK_DEADZONE) {
+            vt_joy_val = 0.0;
+        }
+        
+        int dpad_val = gamepad.getPOV(DPAD_AXIS_XBOX);
+        if (dpad_val != prevDpadValXbox) {
+            if (dpad_val != -1) {
+                updateXboxSpeedCaps(dpad_val);
+            }
+            prevDpadValXbox = dpad_val;
+        }
+
+        vx_joy_val *= speedCapXbox;
+        vy_joy_val *= speedCapXbox;
+        vt_joy_val *= rotationCapXbox;
+
+        // System.out.println(
+        //     "x: " + vx_joy_val + 
+        //     "\ty: " + vy_joy_val + 
+        //     "\tt: " + vt_joy_val
+        // );
+        
+        targetState = targetState.changeTranslationVelocity(new Vector2D(vx_joy_val, vy_joy_val));
+        targetState = targetState.changeRotationVelocity(vt_joy_val);
+
+        return targetState;
+    }
+
+    private void updateXboxSpeedCaps(int dpad_val)
+    {
+        switch (dpad_val) {
+            case 180:
+                speedCapIndexXbox -= 1;
+                if (speedCapIndexXbox < 0) {
+                    speedCapIndexXbox = 0;
+                }
+                break;
+            case 0:
+                speedCapIndexXbox += 1;
+                if (speedCapIndexXbox > 4) {
+                    speedCapIndexXbox = 4;
+                }
+                break;
+            default:
+                break;
+        }
+
+        switch (speedCapIndexXbox) {
+            case 0: 
+                speedCapXbox = MAX_SPEED / 5.0;
+                rotationCapXbox = MAX_ROTATION / 5.0;
+                break;
+            case 1: 
+                speedCapXbox = MAX_SPEED * 2.0 / 5.0;
+                rotationCapXbox = MAX_ROTATION * 2.0 / 5.0;
+                break;
+            case 2: 
+                speedCapXbox = MAX_SPEED * 3.0 / 5.0;
+                rotationCapXbox = MAX_ROTATION * 3.0 / 5.0;
+                break;
+            case 3: 
+                speedCapXbox = MAX_SPEED * 4.0 / 5.0;
+                rotationCapXbox = MAX_ROTATION * 4.0 / 5.0;
+                break;
+            case 4: 
+                speedCapXbox = MAX_SPEED;
+                rotationCapXbox = MAX_ROTATION;
+                break;
+            default:
+                break;
+        }
+        System.out.println("Setting speed cap to: " + speedCapXbox);
+    }
+
+    private MotionState joystickUpdateOpenTX(MotionState targetState)
+    {
         // Check robot-centric mode
         if (gamepad.getRawButton(1)) {
             chassis.setRobotCentic();
+            System.out.println("Setting to robot centric mode");
         }
 
         // Check field-centric mode
         if (gamepad.getRawButton(4)) {
             chassis.setFieldCentic();
+            System.out.println("Setting to field centric mode");
         }
 
         // Check hammer mode
         if (gamepad.getRawButton(5)) {
+            System.out.println("Enabling hammer mode");
             chassis.enableHammerMode();
         } else {
             chassis.disableHammerMode();
         }
 
-        // The target motion state to set
-        MotionState targetState = chassis.getTargetState();
-
         // Check if the translation angle should be updated
         if (Math.sqrt(
-                Math.pow(gamepad.getRawAxis(TRANS_X_AXIS), 2) + Math.pow(gamepad.getRawAxis(TRANS_Y_AXIS), 2)) > 0.6) {
+                Math.pow(gamepad.getRawAxis(TRANS_X_AXIS_OPENTX), 2) + Math.pow(gamepad.getRawAxis(TRANS_Y_AXIS_OPENTX), 2)) > 0.6) {
             this.translationAngle = new WrappedAngle(-Math.toDegrees(
-                    Math.atan2(gamepad.getRawAxis(TRANS_X_AXIS), INVERT_TRANS_Y * gamepad.getRawAxis(TRANS_Y_AXIS))));
+                    Math.atan2(gamepad.getRawAxis(TRANS_X_AXIS_OPENTX), INVERT_TRANS_Y * gamepad.getRawAxis(TRANS_Y_AXIS_OPENTX))));
         }
 
         // Determine the translation speed
         // double translationSpeed = gamepad.getRawAxis(3) * (gamepad.getRawAxis(2) *
         // 0.75 + 0.25) * MAX_SPEED;
-        double translationSpeed = gamepad.getRawAxis(THROTTLE_AXIS) * MAX_SPEED;
+        double translationSpeed = gamepad.getRawAxis(THROTTLE_AXIS_OPENTX) * MAX_SPEED;
 
         // If translation speed is 0, make it slightly larger so the wheels will still
         // turn
@@ -314,20 +433,14 @@ public class Robot extends TimedRobot {
                 .changeTranslationVelocity(Vector2D.createPolarCoordinates(translationSpeed, this.translationAngle));
 
         // Set the rotation velocity
-        if (Math.abs(gamepad.getRawAxis(ROTATION_AXIS)) > 0.15) {
-            targetState = targetState.changeRotationVelocity(-Math.signum(gamepad.getRawAxis(ROTATION_AXIS))
-                    * (Math.abs(gamepad.getRawAxis(ROTATION_AXIS)) * 0.9 + 0.1) * MAX_ROTATION);
+        if (Math.abs(gamepad.getRawAxis(ROTATION_AXIS_OPENTX)) > 0.15) {
+            targetState = targetState.changeRotationVelocity(-Math.signum(gamepad.getRawAxis(ROTATION_AXIS_OPENTX))
+                    * (Math.abs(gamepad.getRawAxis(ROTATION_AXIS_OPENTX)) * 0.9 + 0.1) * MAX_ROTATION);
         } else {
             targetState = targetState.changeRotationVelocity(0);
         }
 
-        if (!network_table_cmd_active) {
-            // Set the target state
-            chassis.setTargetState(targetState);
-
-            // Update the chassis
-            chassis.update();
-        }
+        return targetState;
     }
 
     @Override
