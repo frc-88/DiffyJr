@@ -64,7 +64,7 @@ public class Robot extends TimedRobot {
     private static final double WHEEL_GEAR_RATIO = 1. / ((1. / 3.5) * Math.PI);
 
     private static final double WIDTH = 12.150 / 12.;
-    private static final double LENGTH = 12.150 * 2 / 12.;
+    private static final double LENGTH = 12.150 / 12.;
 
     private static final double MAX_SPEED = 14.7;
     private static final double MAX_ROTATION = 360;
