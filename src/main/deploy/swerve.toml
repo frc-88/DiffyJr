@@ -1,0 +1,4 @@
+[gyro]
+design = "navx" # Type of gyro
+port-type = "I2C" # One of {SPI, I2C, Serial}
+port = "kMXP" # The port name as in the WPILib enum

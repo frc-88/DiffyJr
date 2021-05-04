@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team88.swerve.SwerveChassis;
+import frc.team88.swerve.configuration.Configuration;
 import frc.team88.swerve.motion.state.MotionState;
 import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.swervemodule.SwerveModule;
@@ -526,5 +527,11 @@ public class Robot extends TimedRobot {
             // Set gyro to 0
             navx.calibrateYaw(0);
         }
+    }
+
+    @Override
+    public void simulationInit() {
+        Configuration config = new Configuration("swerve.toml");
+        System.out.println(config.getGyro());
     }
 }
