@@ -68,7 +68,8 @@ public class Robot extends TimedRobot {
     private static final double LENGTH = 12.150 / 12.;
 
     private static final double MAX_SPEED = 14.7;
-    private static final double MAX_ROTATION = 360;
+    private static final double MAX_ROTATION_SPEED = 360.0;
+    private static final double MAX_ROTATION_ACCEL = 720.0;
 
     private static final long NETWORK_TABLE_CMD_TIMEOUT_US = 500000;
     private boolean network_table_cmd_active = true;
@@ -94,7 +95,7 @@ public class Robot extends TimedRobot {
     private static final double XBOX_JOYSTICK_DEADZONE = 0.07;
 
     private double speedCapXbox = MAX_SPEED / 5.0;
-    private double rotationCapXbox = MAX_ROTATION / 5.0;
+    private double rotationCapXbox = MAX_ROTATION_SPEED / 5.0;
     private int speedCapIndexXbox = 0;
     private int prevDpadValXbox = -1;
 
@@ -106,8 +107,8 @@ public class Robot extends TimedRobot {
         // Initialize the PID constants
         motorSpeedPIDConstants = new PIDPreferenceConstants("Motor Speed", 0, 0.00000035, 0, 0.00019, 150, 0, 0);
         azimuthPositionPIDConstants = new PIDPreferenceConstants("Azimuth Position", 8.5, 0, 0.15, 0, 0, 0, 0);
-        maxAzimuthSpeed = new DoublePreferenceConstant("Azimuth Max Speed", 360);
-        maxAzimuthAcceleration = new DoublePreferenceConstant("Azimuth Max Accel", 720);
+        maxAzimuthSpeed = new DoublePreferenceConstant("Azimuth Max Speed", MAX_ROTATION_SPEED);
+        maxAzimuthAcceleration = new DoublePreferenceConstant("Azimuth Max Accel", MAX_ROTATION_ACCEL);
 
         // Create the base NEOs
         motors = new HashMap<>();
@@ -372,23 +373,23 @@ public class Robot extends TimedRobot {
         switch (speedCapIndexXbox) {
             case 0: 
                 speedCapXbox = MAX_SPEED / 5.0;
-                rotationCapXbox = MAX_ROTATION / 5.0;
+                rotationCapXbox = MAX_ROTATION_SPEED / 5.0;
                 break;
             case 1: 
                 speedCapXbox = MAX_SPEED * 2.0 / 5.0;
-                rotationCapXbox = MAX_ROTATION * 2.0 / 5.0;
+                rotationCapXbox = MAX_ROTATION_SPEED * 3.0 / 10.0;
                 break;
             case 2: 
                 speedCapXbox = MAX_SPEED * 3.0 / 5.0;
-                rotationCapXbox = MAX_ROTATION * 3.0 / 5.0;
+                rotationCapXbox = MAX_ROTATION_SPEED * 2.0 / 5.0;
                 break;
             case 3: 
                 speedCapXbox = MAX_SPEED * 4.0 / 5.0;
-                rotationCapXbox = MAX_ROTATION * 4.0 / 5.0;
+                rotationCapXbox = MAX_ROTATION_SPEED / 2.0;
                 break;
             case 4: 
                 speedCapXbox = MAX_SPEED;
-                rotationCapXbox = MAX_ROTATION;
+                rotationCapXbox = MAX_ROTATION_SPEED * 3.0 / 5.0;
                 break;
             default:
                 break;
@@ -443,7 +444,7 @@ public class Robot extends TimedRobot {
         // Set the rotation velocity
         if (Math.abs(gamepad.getRawAxis(ROTATION_AXIS_OPENTX)) > 0.15) {
             targetState = targetState.changeRotationVelocity(-Math.signum(gamepad.getRawAxis(ROTATION_AXIS_OPENTX))
-                    * (Math.abs(gamepad.getRawAxis(ROTATION_AXIS_OPENTX)) * 0.9 + 0.1) * MAX_ROTATION);
+                    * (Math.abs(gamepad.getRawAxis(ROTATION_AXIS_OPENTX)) * 0.9 + 0.1) * MAX_ROTATION_SPEED);
         } else {
             targetState = targetState.changeRotationVelocity(0);
         }
