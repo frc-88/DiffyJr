@@ -26,8 +26,8 @@ import frc.team88.swerve.motion.state.OdomState;
 import frc.team88.swerve.swervemodule.SwerveModule;
 import frc.team88.swerve.swervemodule.motorsensor.CANifiedPWMEncoder;
 import frc.team88.swerve.swervemodule.motorsensor.MotorCombiner;
-import frc.team88.swerve.swervemodule.motorsensor.PIDFalcon;
-import frc.team88.swerve.swervemodule.motorsensor.PIDMotor;
+import frc.team88.swerve.swervemodule.motorsensor.SwerveFalcon;
+import frc.team88.swerve.swervemodule.motorsensor.SwerveMotor;
 import frc.team88.swerve.swervemodule.motorsensor.PIDTransmission;
 import frc.team88.swerve.swervemodule.motorsensor.PositionVelocitySensor;
 import frc.team88.swerve.swervemodule.motorsensor.SensorTransmission;
@@ -48,8 +48,8 @@ import frc.team88.swerve.networking.SwerveNetworkTables;
  * project.
  */
 public class Robot extends TimedRobot {
-    private HashMap<String, PIDFalcon> motors;
-    private HashMap<String, PIDMotor> outputs;
+    private HashMap<String, SwerveFalcon> motors;
+    private HashMap<String, SwerveMotor> outputs;
     private HashMap<String, PositionVelocitySensor> azimuthEncoders;
     private HashMap<String, SwerveModule> modules;
     private NavX navx;
@@ -112,17 +112,17 @@ public class Robot extends TimedRobot {
 
         // Create the base NEOs
         motors = new HashMap<>();
-        motors.put("fl+", new PIDFalcon(1, motorSpeedPIDConstants));
-        motors.put("fl-", new PIDFalcon(16, motorSpeedPIDConstants));
-        motors.put("bl+", new PIDFalcon(2, motorSpeedPIDConstants));
-        motors.put("bl-", new PIDFalcon(3, motorSpeedPIDConstants));
-        motors.put("br+", new PIDFalcon(13, motorSpeedPIDConstants));
-        motors.put("br-", new PIDFalcon(12, motorSpeedPIDConstants));
-        motors.put("fr+", new PIDFalcon(14, motorSpeedPIDConstants));
-        motors.put("fr-", new PIDFalcon(15, motorSpeedPIDConstants));
+        motors.put("fl+", new SwerveFalcon(1, motorSpeedPIDConstants));
+        motors.put("fl-", new SwerveFalcon(16, motorSpeedPIDConstants));
+        motors.put("bl+", new SwerveFalcon(2, motorSpeedPIDConstants));
+        motors.put("bl-", new SwerveFalcon(3, motorSpeedPIDConstants));
+        motors.put("br+", new SwerveFalcon(13, motorSpeedPIDConstants));
+        motors.put("br-", new SwerveFalcon(12, motorSpeedPIDConstants));
+        motors.put("fr+", new SwerveFalcon(14, motorSpeedPIDConstants));
+        motors.put("fr-", new SwerveFalcon(15, motorSpeedPIDConstants));
 
         // Reversing all neos makes for counterclockise azimuth to be positve
-        for (Map.Entry<String, PIDFalcon> entry : motors.entrySet()) {
+        for (Map.Entry<String, SwerveFalcon> entry : motors.entrySet()) {
             entry.getValue().setInverted(true);
         }
 
@@ -503,7 +503,7 @@ public class Robot extends TimedRobot {
             calibrateMode = true;
 
             // Set all motors to coast mode
-            for (Map.Entry<String, PIDFalcon> motor : motors.entrySet()) {
+            for (Map.Entry<String, SwerveFalcon> motor : motors.entrySet()) {
                 motor.getValue().setNeutralMode(NeutralMode.Coast);
                 ;
             }
@@ -515,7 +515,7 @@ public class Robot extends TimedRobot {
             calibrateMode = false;
 
             // Set all motors back to brake mode
-            for (Map.Entry<String, PIDFalcon> motor : motors.entrySet()) {
+            for (Map.Entry<String, SwerveFalcon> motor : motors.entrySet()) {
                 motor.getValue().setNeutralMode(NeutralMode.Brake);
             }
             // Set azimuths to 0
