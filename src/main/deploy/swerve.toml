@@ -1,7 +1,7 @@
 [gyro]
-template = "navx" # Type of gyro
-port-type = "I2C" # One of {SPI, I2C, Serial}
-port = "kMXP" # The port name as in the WPILib enum
+template = "navx"
+port-type = "I2C"
+port = "kMXP"
 
 [[modules]]
 template = "team88.diff-swerve-2021.beta"
