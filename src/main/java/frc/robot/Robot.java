@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.team88.swerve.SwerveController;
@@ -41,7 +42,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        System.out.println("Diffy Jr is initializing!");
+        System.out.println("Diffy Jr starting!");
+        
         m_swerve = new SwerveController("swerve.toml");
         System.out.println("Diffy Jr is ready!");
     }
