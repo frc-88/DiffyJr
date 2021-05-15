@@ -70,6 +70,7 @@ public class Robot extends TimedRobot {
             case kFrsky:
                 this.zeroButton = () -> gamepad.getRawButton(4);
                 this.translationDirection = () -> 0;
+                this.maintainDirection = () -> true;
                 this.translationSpeed = () -> 0;
                 this.rotationVelocity = () -> 0;
                 this.fieldCentricMode = () -> true;
