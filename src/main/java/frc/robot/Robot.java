@@ -11,6 +11,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.team88.swerve.SwerveController;
 
@@ -46,6 +47,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         this.swerve = new SwerveController("swerve.toml");
+        this.swerve.disableLoggingOnRIO();
         this.swerve.setGyroYaw(0);
 
         this.gamepad = new Joystick(0);
