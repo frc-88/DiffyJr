@@ -8,7 +8,10 @@ template = "team88.diff-swerve-2021.beta"
 location-inches = { x = -6.075, y = 6.075 }
 motors.0.can-id = 1
 motors.1.can-id = 16
+<<<<<<< HEAD
 azimuth-sensor.template = "canified-pwm"
+=======
+>>>>>>> dd2a97b0a2460a4ce0e2b123d5696d41e561b95f
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 0
 azimuth-sensor.offset = -44.17
@@ -18,7 +21,10 @@ template = "team88.diff-swerve-2021.beta"
 location-inches = { x = -6.075, y = -6.075 }
 motors.0.can-id = 2
 motors.1.can-id = 3
+<<<<<<< HEAD
 azimuth-sensor.template = "canified-pwm"
+=======
+>>>>>>> dd2a97b0a2460a4ce0e2b123d5696d41e561b95f
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 1
 azimuth-sensor.offset = -139.09
@@ -28,7 +34,10 @@ template = "team88.diff-swerve-2021.beta"
 location-inches = { x = 6.075, y = -6.075 }
 motors.0.can-id = 13
 motors.1.can-id = 12
+<<<<<<< HEAD
 azimuth-sensor.template = "canified-pwm"
+=======
+>>>>>>> dd2a97b0a2460a4ce0e2b123d5696d41e561b95f
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 2
 azimuth-sensor.offset = 125.81
@@ -38,7 +47,10 @@ template = "team88.diff-swerve-2021.beta"
 location-inches = { x = 6.075, y = 6.075 }
 motors.0.can-id = 14
 motors.1.can-id = 15
+<<<<<<< HEAD
 azimuth-sensor.template = "canified-pwm"
+=======
+>>>>>>> dd2a97b0a2460a4ce0e2b123d5696d41e561b95f
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 3
 azimuth-sensor.offset = 40.38
