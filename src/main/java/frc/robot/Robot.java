@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
     private Joystick gamepad;
 
     private static final double MAX_SPEED = 14.7;
-    private static final double MAX_ROTATION = 360.;
+    private static final double MAX_ROTATION = 90.;
 
     private BooleanSupplier zeroButton;
     private DoubleSupplier translationDirection;
@@ -64,7 +64,7 @@ public class Robot extends TimedRobot {
                     return Math.sqrt(x*x + y*y) < 0.25;
                 };
                 this.translationSpeed = () -> gamepad.getRawAxis(3) * MAX_SPEED;
-                this.rotationVelocity = () -> deadbandExponential(gamepad.getRawAxis(4), 2, 0.075) * MAX_ROTATION;
+                this.rotationVelocity = () -> deadbandExponential(gamepad.getRawAxis(4), 3, 0.075) * MAX_ROTATION;
                 this.fieldCentricMode = () -> !gamepad.getRawButton(6);
                 break;
             case kFrsky:
