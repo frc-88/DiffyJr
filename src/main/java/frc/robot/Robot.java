@@ -46,7 +46,6 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         this.swerve = new SwerveController("swerve.toml");
-        this.swerve.disableLoggingOnRIO();
         this.swerve.setGyroYaw(0);
 
         this.gamepad = new Joystick(0);
