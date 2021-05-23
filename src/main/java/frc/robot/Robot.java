@@ -25,9 +25,10 @@ public class Robot extends TimedRobot {
 
     private enum ControllerMode {
         kXBox,
+        kXBox2,
         kFrsky;
     }
-    private final ControllerMode controllerMode = ControllerMode.kXBox;
+    private final ControllerMode controllerMode = ControllerMode.kXBox2;
 
     private SwerveController swerve;
 
@@ -36,12 +37,23 @@ public class Robot extends TimedRobot {
     private static final double MAX_SPEED = 14.7;
     private static final double MAX_ROTATION = 90.;
 
+    private final double[] SPEED_MODES = {
+        0.65, 4.0, 7.0, 10.0, MAX_SPEED
+    };
+    private final double[] ROTATION_MODES = {
+        5.0, 10.0, 20.0, 50.0, MAX_ROTATION
+    };
+    private int speedSelection = 0;
+    private int prevDpadValue = 0;
+
     private BooleanSupplier zeroButton;
     private DoubleSupplier translationDirection;
     private BooleanSupplier maintainDirection;
     private DoubleSupplier translationSpeed;
     private DoubleSupplier rotationVelocity;
     private BooleanSupplier fieldCentricMode;
+    private DoubleSupplier speedCap;
+    private DoubleSupplier rotationCap;
 
     @Override
     public void robotInit() {
@@ -49,6 +61,8 @@ public class Robot extends TimedRobot {
         this.swerve.setGyroYaw(0);
 
         this.gamepad = new Joystick(0);
+
+        this.swerve.setNtMuxId(1);
 
         switch (this.controllerMode) {
             case kXBox:
@@ -66,6 +80,8 @@ public class Robot extends TimedRobot {
                 this.translationSpeed = () -> gamepad.getRawAxis(3) * MAX_SPEED;
                 this.rotationVelocity = () -> deadbandExponential(gamepad.getRawAxis(4), 3, 0.075) * MAX_ROTATION;
                 this.fieldCentricMode = () -> !gamepad.getRawButton(6);
+                this.speedCap = () -> MAX_SPEED;
+                this.rotationCap = () -> MAX_ROTATION;
                 break;
             case kFrsky:
                 this.zeroButton = () -> gamepad.getRawButton(4);
@@ -74,8 +90,55 @@ public class Robot extends TimedRobot {
                 this.translationSpeed = () -> 0;
                 this.rotationVelocity = () -> 0;
                 this.fieldCentricMode = () -> true;
+                this.speedCap = () -> MAX_SPEED;
+                this.rotationCap = () -> MAX_ROTATION;
+                break;
+            case kXBox2:
+                this.zeroButton = () -> gamepad.getRawButton(4);
+                this.translationDirection = () -> {
+                    double x = gamepad.getRawAxis(0);
+                    double y = -gamepad.getRawAxis(1);
+                    return Math.toDegrees(Math.atan2(-x, y));
+                };
+                this.maintainDirection = () -> {
+                    double x = gamepad.getRawAxis(0);
+                    double y = -gamepad.getRawAxis(1);
+                    return Math.sqrt(x*x + y*y) < 0.25;
+                };
+                this.translationSpeed = () -> {
+                    double x = gamepad.getRawAxis(0);
+                    double y = -gamepad.getRawAxis(1);
+                    return Math.sqrt(x*x + y*y) * speedCap.getAsDouble();
+                };
+                this.rotationVelocity = () -> deadbandExponential(gamepad.getRawAxis(4), 3, 0.075) * rotationCap.getAsDouble();
+                this.fieldCentricMode = () -> gamepad.getRawButton(6);
+                this.speedCap = () -> {
+                    this.updateSpeedSelection(0);
+                    return SPEED_MODES[speedSelection];
+                };
+                this.rotationCap = () -> {
+                    this.updateSpeedSelection(0);
+                    return ROTATION_MODES[speedSelection];
+                };
                 break;
         }
+    }
+
+    private void updateSpeedSelection(int pov) {
+        int dpad = gamepad.getPOV(pov);
+        if (prevDpadValue != dpad) {
+            switch(dpad) {
+                case 0: speedSelection++;
+                case 180: speedSelection--;
+            }
+        }
+        if (speedSelection >= SPEED_MODES.length) {
+            speedSelection = SPEED_MODES.length - 1;
+        }
+        else if (speedSelection < 0) {
+            speedSelection = 0;
+        }
+        prevDpadValue = dpad;
     }
 
     @Override
@@ -117,6 +180,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        this.swerve.activateMux(0);
         this.swerve.setVelocity(this.translationSpeed.getAsDouble(), this.rotationVelocity.getAsDouble());
 
         if (!this.maintainDirection.getAsBoolean()) {
@@ -124,6 +188,7 @@ public class Robot extends TimedRobot {
         } else if (this.translationSpeed.getAsDouble() < 0.1 && Math.abs(this.rotationVelocity.getAsDouble()) < 0.1) {
             this.swerve.holdDirection();
         }
+        this.swerve.controlFromNt();
     }
 
     @Override
