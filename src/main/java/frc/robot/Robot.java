@@ -36,12 +36,13 @@ public class Robot extends TimedRobot {
 
     private static final double MAX_SPEED = 14.7;
     private static final double MAX_ROTATION = 90.;
+    private static final double DEADZONE = 0.2;
 
     private final double[] SPEED_MODES = {
         0.65, 4.0, 7.0, 10.0, MAX_SPEED
     };
     private final double[] ROTATION_MODES = {
-        5.0, 10.0, 20.0, 50.0, MAX_ROTATION
+        10.0, 20.0, 30.0, 50.0, MAX_ROTATION
     };
     private int speedSelection = 0;
     private int prevDpadValue = 0;
@@ -62,8 +63,6 @@ public class Robot extends TimedRobot {
 
         this.gamepad = new Joystick(0);
 
-        this.swerve.setNtMuxId(1);
-
         switch (this.controllerMode) {
             case kXBox:
                 this.zeroButton = () -> gamepad.getRawButton(4);
@@ -78,7 +77,7 @@ public class Robot extends TimedRobot {
                     return Math.sqrt(x*x + y*y) < 0.25;
                 };
                 this.translationSpeed = () -> gamepad.getRawAxis(3) * MAX_SPEED;
-                this.rotationVelocity = () -> deadbandExponential(gamepad.getRawAxis(4), 3, 0.075) * MAX_ROTATION;
+                this.rotationVelocity = () -> deadbandExponential(-gamepad.getRawAxis(4), 3, DEADZONE) * MAX_ROTATION;
                 this.fieldCentricMode = () -> !gamepad.getRawButton(6);
                 this.speedCap = () -> MAX_SPEED;
                 this.rotationCap = () -> MAX_ROTATION;
@@ -108,9 +107,15 @@ public class Robot extends TimedRobot {
                 this.translationSpeed = () -> {
                     double x = gamepad.getRawAxis(0);
                     double y = -gamepad.getRawAxis(1);
-                    return Math.sqrt(x*x + y*y) * speedCap.getAsDouble();
+                    double mag = Math.sqrt(x*x + y*y);
+                    if (Math.abs(mag) < DEADZONE) {
+                        return 0.0;
+                    }
+                    else {
+                        return Math.sqrt(x*x + y*y) * speedCap.getAsDouble();
+                    }
                 };
-                this.rotationVelocity = () -> deadbandExponential(gamepad.getRawAxis(4), 3, 0.075) * rotationCap.getAsDouble();
+                this.rotationVelocity = () -> deadbandExponential(-gamepad.getRawAxis(4), 3, DEADZONE) * rotationCap.getAsDouble();
                 this.fieldCentricMode = () -> gamepad.getRawButton(6);
                 this.speedCap = () -> {
                     this.updateSpeedSelection(0);
@@ -128,9 +133,12 @@ public class Robot extends TimedRobot {
         int dpad = gamepad.getPOV(pov);
         if (prevDpadValue != dpad) {
             switch(dpad) {
-                case 0: speedSelection++;
-                case 180: speedSelection--;
+                case 0: speedSelection++; break;
+                case 180: speedSelection--; break;
             }
+        }
+        else {
+            return;
         }
         if (speedSelection >= SPEED_MODES.length) {
             speedSelection = SPEED_MODES.length - 1;
@@ -138,6 +146,7 @@ public class Robot extends TimedRobot {
         else if (speedSelection < 0) {
             speedSelection = 0;
         }
+        System.out.println(String.format("Speed selection: %d", speedSelection));
         prevDpadValue = dpad;
     }
 
@@ -180,7 +189,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        this.swerve.activateMux(0);
+        this.swerve.activateMuxId(0);
         this.swerve.setVelocity(this.translationSpeed.getAsDouble(), this.rotationVelocity.getAsDouble());
 
         if (!this.maintainDirection.getAsBoolean()) {

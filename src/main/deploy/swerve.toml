@@ -5,16 +5,15 @@ port = "kMXP"
 
 [[command-mux]]
 # NetworkTables mux
-template = "template"
+template = "networktables"
 priority = 1
-id = 1
 timeout = 1.0
 
 [[command-mux]]
 # Joystick mux
-template = "template"
-priority = 100
+template = "basic"
 id = 0
+priority = 100
 timeout = 0.0
 
 [[modules]]
