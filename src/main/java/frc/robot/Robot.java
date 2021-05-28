@@ -197,6 +197,7 @@ public class Robot extends TimedRobot {
             this.swerve.holdDirection();
         }
         if (this.swerve.isNetworkTableCommandActive(1.0)) {
+            System.out.println("commanding from NT");
             this.swerve.commandFromNetworkTables();
         }
     }
