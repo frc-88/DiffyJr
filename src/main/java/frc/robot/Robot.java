@@ -115,7 +115,7 @@ public class Robot extends TimedRobot {
                         return Math.sqrt(x*x + y*y) * speedCap.getAsDouble();
                     }
                 };
-                this.rotationVelocity = () -> deadbandExponential(-gamepad.getRawAxis(4), 3, DEADZONE) * rotationCap.getAsDouble();
+                this.rotationVelocity = () -> deadbandExponential(gamepad.getRawAxis(4), 3, DEADZONE) * rotationCap.getAsDouble();
                 this.fieldCentricMode = () -> gamepad.getRawButton(6);
                 this.speedCap = () -> {
                     this.updateSpeedSelection(0);
@@ -189,7 +189,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        this.swerve.activateMuxId(0);
         this.swerve.setVelocity(this.translationSpeed.getAsDouble(), this.rotationVelocity.getAsDouble());
 
         if (!this.maintainDirection.getAsBoolean()) {
@@ -197,7 +196,9 @@ public class Robot extends TimedRobot {
         } else if (this.translationSpeed.getAsDouble() < 0.1 && Math.abs(this.rotationVelocity.getAsDouble()) < 0.1) {
             this.swerve.holdDirection();
         }
-        this.swerve.controlFromNt();
+        if (this.swerve.isNetworkTableCommandActive(1.0)) {
+            this.swerve.commandFromNetworkTables();
+        }
     }
 
     @Override

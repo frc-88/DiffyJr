@@ -3,19 +3,6 @@ template = "navx"
 port-type = "I2C"
 port = "kMXP"
 
-[[command-mux]]
-# NetworkTables mux
-template = "networktables"
-priority = 1
-timeout = 1.0
-
-[[command-mux]]
-# Joystick mux
-template = "basic"
-id = 0
-priority = 100
-timeout = 0.0
-
 [[modules]]
 template = "team88.diff-swerve-2021.beta"
 location-inches = { x = 6.075, y = 6.075 }
