@@ -35,14 +35,14 @@ public class Robot extends TimedRobot {
     private Joystick gamepad;
 
     private static final double MAX_SPEED = 14.7;
-    private static final double MAX_ROTATION = 90.;
+    private static final double MAX_ROTATION = 360.;
     private static final double DEADZONE = 0.2;
 
     private final double[] SPEED_MODES = {
         0.65, 4.0, 7.0, 10.0, MAX_SPEED
     };
     private final double[] ROTATION_MODES = {
-        10.0, 20.0, 30.0, 50.0, MAX_ROTATION
+        40.0, 90.0, 150.0, 260.0, MAX_ROTATION
     };
     private int speedSelection = 0;
     private int prevDpadValue = 0;
@@ -115,7 +115,7 @@ public class Robot extends TimedRobot {
                         return Math.sqrt(x*x + y*y) * speedCap.getAsDouble();
                     }
                 };
-                this.rotationVelocity = () -> deadbandExponential(gamepad.getRawAxis(4), 3, DEADZONE) * rotationCap.getAsDouble();
+                this.rotationVelocity = () -> deadbandExponential(-gamepad.getRawAxis(4), 3, DEADZONE) * rotationCap.getAsDouble();
                 this.fieldCentricMode = () -> gamepad.getRawButton(6);
                 this.speedCap = () -> {
                     this.updateSpeedSelection(0);

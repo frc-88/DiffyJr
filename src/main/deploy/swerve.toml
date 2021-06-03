@@ -12,6 +12,7 @@ azimuth-sensor.template = "canified-pwm"
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 0
 azimuth-sensor.offset = -44.17
+wheel-diameter-inches = 3.45
 
 [[modules]]
 template = "team88.diff-swerve-2021.beta"
@@ -22,6 +23,7 @@ azimuth-sensor.template = "canified-pwm"
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 1
 azimuth-sensor.offset = -139.09
+wheel-diameter-inches = 3.45
 
 [[modules]]
 template = "team88.diff-swerve-2021.beta"
@@ -32,6 +34,7 @@ azimuth-sensor.template = "canified-pwm"
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 2
 azimuth-sensor.offset = 125.81
+wheel-diameter-inches = 3.45
 
 [[modules]]
 template = "team88.diff-swerve-2021.beta"
@@ -42,3 +45,4 @@ azimuth-sensor.template = "canified-pwm"
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 3
 azimuth-sensor.offset = 40.38
+wheel-diameter-inches = 3.45
