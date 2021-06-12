@@ -14,6 +14,21 @@ azimuth-sensor.pwm-channel = 0
 azimuth-sensor.offset = -44.17
 wheel-diameter-inches = 3.45
 
+azimuth-controller.kP = 1.0
+# azimuth-controller.kI = 0.0
+azimuth-controller.kD = 0.0
+# azimuth-controller.kF = 0.0
+# azimuth-controller.i-zone = 0.0
+# azimuth-controller.i-max = 0.0
+# azimuth-controller.max-speed = 0.0
+# azimuth-controller.max-acceleration = 0.0
+
+wheel-controller.kP = 0.5
+wheel-controller.kI = 0.0
+wheel-controller.kD = 0.0
+# wheel-controller.i-zone = 0.0
+# wheel-controller.i-max = 0.0
+
 [[modules]]
 template = "team88.diff-swerve-2021.beta"
 location-inches = { x = -6.075, y = 6.075 }
@@ -24,6 +39,21 @@ azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 1
 azimuth-sensor.offset = -139.09
 wheel-diameter-inches = 3.45
+
+azimuth-controller.kP = 1.0
+# azimuth-controller.kI = 0.0
+azimuth-controller.kD = 0.0
+# azimuth-controller.kF = 0.0
+# azimuth-controller.i-zone = 0.0
+# azimuth-controller.i-max = 0.0
+# azimuth-controller.max-speed = 0.0
+# azimuth-controller.max-acceleration = 0.0
+
+wheel-controller.kP = 0.5
+wheel-controller.kI = 0.0
+wheel-controller.kD = 0.0
+# wheel-controller.i-zone = 0.0
+# wheel-controller.i-max = 0.0
 
 [[modules]]
 template = "team88.diff-swerve-2021.beta"
@@ -36,6 +66,21 @@ azimuth-sensor.pwm-channel = 2
 azimuth-sensor.offset = 125.81
 wheel-diameter-inches = 3.45
 
+azimuth-controller.kP = 1.0
+# azimuth-controller.kI = 0.0
+azimuth-controller.kD = 0.0
+# azimuth-controller.kF = 0.0
+# azimuth-controller.i-zone = 0.0
+# azimuth-controller.i-max = 0.0
+# azimuth-controller.max-speed = 0.0
+# azimuth-controller.max-acceleration = 0.0
+
+wheel-controller.kP = 0.5
+wheel-controller.kI = 0.0
+wheel-controller.kD = 0.0
+# wheel-controller.i-zone = 0.0
+# wheel-controller.i-max = 0.0
+
 [[modules]]
 template = "team88.diff-swerve-2021.beta"
 location-inches = { x = 6.075, y = -6.075 }
@@ -46,3 +91,18 @@ azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 3
 azimuth-sensor.offset = 40.38
 wheel-diameter-inches = 3.45
+
+azimuth-controller.kP = 1.0
+# azimuth-controller.kI = 0.0
+azimuth-controller.kD = 0.0
+# azimuth-controller.kF = 0.0
+# azimuth-controller.i-zone = 0.0
+# azimuth-controller.i-max = 0.0
+# azimuth-controller.max-speed = 0.0
+# azimuth-controller.max-acceleration = 0.0
+
+wheel-controller.kP = 0.5
+wheel-controller.kI = 0.0
+wheel-controller.kD = 0.0
+# wheel-controller.i-zone = 0.0
+# wheel-controller.i-max = 0.0

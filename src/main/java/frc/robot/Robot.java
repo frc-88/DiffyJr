@@ -95,18 +95,18 @@ public class Robot extends TimedRobot {
             case kXBox2:
                 this.zeroButton = () -> gamepad.getRawButton(4);
                 this.translationDirection = () -> {
-                    double x = gamepad.getRawAxis(0);
-                    double y = -gamepad.getRawAxis(1);
+                    double x = -gamepad.getRawAxis(0);
+                    double y = gamepad.getRawAxis(1);
                     return Math.toDegrees(Math.atan2(-x, y));
                 };
                 this.maintainDirection = () -> {
-                    double x = gamepad.getRawAxis(0);
-                    double y = -gamepad.getRawAxis(1);
+                    double x = -gamepad.getRawAxis(0);
+                    double y = gamepad.getRawAxis(1);
                     return Math.sqrt(x*x + y*y) < 0.25;
                 };
                 this.translationSpeed = () -> {
-                    double x = gamepad.getRawAxis(0);
-                    double y = -gamepad.getRawAxis(1);
+                    double x = -gamepad.getRawAxis(0);
+                    double y = gamepad.getRawAxis(1);
                     double mag = Math.sqrt(x*x + y*y);
                     if (Math.abs(mag) < DEADZONE) {
                         return 0.0;
@@ -196,10 +196,10 @@ public class Robot extends TimedRobot {
         } else if (this.translationSpeed.getAsDouble() < 0.1 && Math.abs(this.rotationVelocity.getAsDouble()) < 0.1) {
             this.swerve.holdDirection();
         }
-        if (this.swerve.isNetworkTableCommandActive(1.0)) {
-            System.out.println("commanding from NT");
-            this.swerve.commandFromNetworkTables();
-        }
+        // if (this.swerve.isNetworkTableCommandActive(1.0)) {
+        //     System.out.println("commanding from NT");
+        //     this.swerve.commandFromNetworkTables();
+        // }
     }
 
     @Override
