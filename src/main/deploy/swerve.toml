@@ -11,8 +11,23 @@ motors.hi.can-id = 16
 azimuth-sensor.template = "canified-pwm"
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 0
-azimuth-sensor.offset = -44.17
+azimuth-sensor.offset = -43.07
 wheel-diameter-inches = 3.45
+
+azimuth-controller.kP = 10.0
+# azimuth-controller.kI = 0.0
+azimuth-controller.kD = 0.0
+# azimuth-controller.kF = 0.0
+# azimuth-controller.i-zone = 0.0
+# azimuth-controller.i-max = 0.0
+# azimuth-controller.max-speed = 0.0
+# azimuth-controller.max-acceleration = 0.0
+
+wheel-controller.kP = 0.5
+wheel-controller.kI = 0.0
+wheel-controller.kD = 0.0
+# wheel-controller.i-zone = 0.0
+# wheel-controller.i-max = 0.0
 
 [[modules]]
 template = "team88.diff-swerve-2021.beta"
@@ -22,8 +37,23 @@ motors.hi.can-id = 3
 azimuth-sensor.template = "canified-pwm"
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 1
-azimuth-sensor.offset = -139.09
+azimuth-sensor.offset = -139.835
 wheel-diameter-inches = 3.45
+
+azimuth-controller.kP = 10.0
+# azimuth-controller.kI = 0.0
+azimuth-controller.kD = 0.0
+# azimuth-controller.kF = 0.0
+# azimuth-controller.i-zone = 0.0
+# azimuth-controller.i-max = 0.0
+# azimuth-controller.max-speed = 0.0
+# azimuth-controller.max-acceleration = 0.0
+
+wheel-controller.kP = 0.5
+wheel-controller.kI = 0.0
+wheel-controller.kD = 0.0
+# wheel-controller.i-zone = 0.0
+# wheel-controller.i-max = 0.0
 
 [[modules]]
 template = "team88.diff-swerve-2021.beta"
@@ -33,8 +63,23 @@ motors.hi.can-id = 12
 azimuth-sensor.template = "canified-pwm"
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 2
-azimuth-sensor.offset = 125.81
+azimuth-sensor.offset = 133.32
 wheel-diameter-inches = 3.45
+
+azimuth-controller.kP = 10.0
+# azimuth-controller.kI = 0.0
+azimuth-controller.kD = 0.0
+# azimuth-controller.kF = 0.0
+# azimuth-controller.i-zone = 0.0
+# azimuth-controller.i-max = 0.0
+# azimuth-controller.max-speed = 0.0
+# azimuth-controller.max-acceleration = 0.0
+
+wheel-controller.kP = 0.5
+wheel-controller.kI = 0.0
+wheel-controller.kD = 0.0
+# wheel-controller.i-zone = 0.0
+# wheel-controller.i-max = 0.0
 
 [[modules]]
 template = "team88.diff-swerve-2021.beta"
@@ -44,5 +89,20 @@ motors.hi.can-id = 15
 azimuth-sensor.template = "canified-pwm"
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 3
-azimuth-sensor.offset = 40.38
+azimuth-sensor.offset = 38.15
 wheel-diameter-inches = 3.45
+
+azimuth-controller.kP = 10.0
+# azimuth-controller.kI = 0.0
+azimuth-controller.kD = 0.0
+# azimuth-controller.kF = 0.0
+# azimuth-controller.i-zone = 0.0
+# azimuth-controller.i-max = 0.0
+# azimuth-controller.max-speed = 0.0
+# azimuth-controller.max-acceleration = 0.0
+
+wheel-controller.kP = 0.5
+wheel-controller.kI = 0.0
+wheel-controller.kD = 0.0
+# wheel-controller.i-zone = 0.0
+# wheel-controller.i-max = 0.0
