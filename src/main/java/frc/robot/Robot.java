@@ -12,6 +12,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.subsystems.SwerveNetworkTable;
 import frc.team88.swerve.SwerveController;
 
 /**
@@ -31,6 +32,7 @@ public class Robot extends TimedRobot {
     private final ControllerMode controllerMode = ControllerMode.kXBox2;
 
     private SwerveController swerve;
+    private SwerveNetworkTable m_swerve_table;
 
     private Joystick gamepad;
 
@@ -60,6 +62,8 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         this.swerve = new SwerveController("swerve.toml");
         this.swerve.setGyroYaw(0);
+
+        m_swerve_table = new SwerveNetworkTable(swerve);
 
         this.gamepad = new Joystick(0);
 
@@ -189,17 +193,19 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        this.swerve.setVelocity(this.translationSpeed.getAsDouble(), this.rotationVelocity.getAsDouble());
-
-        if (!this.maintainDirection.getAsBoolean()) {
-            this.swerve.setTranslationDirection(this.translationDirection.getAsDouble(), this.fieldCentricMode.getAsBoolean());
-        } else if (this.translationSpeed.getAsDouble() < 0.1 && Math.abs(this.rotationVelocity.getAsDouble()) < 0.1) {
-            this.swerve.holdDirection();
+        if (m_swerve_table.isCommandActive()) {
+            System.out.println("commanding from NT");
+            m_swerve_table.setCommand();
         }
-        // if (this.swerve.isNetworkTableCommandActive(1.0)) {
-        //     System.out.println("commanding from NT");
-        //     this.swerve.commandFromNetworkTables();
-        // }
+        else {
+            this.swerve.setVelocity(this.translationSpeed.getAsDouble(), this.rotationVelocity.getAsDouble());
+
+            if (!this.maintainDirection.getAsBoolean()) {
+                this.swerve.setTranslationDirection(this.translationDirection.getAsDouble(), this.fieldCentricMode.getAsBoolean());
+            } else if (this.translationSpeed.getAsDouble() < 0.1 && Math.abs(this.rotationVelocity.getAsDouble()) < 0.1) {
+                this.swerve.holdDirection();
+            }
+        }
     }
 
     @Override
