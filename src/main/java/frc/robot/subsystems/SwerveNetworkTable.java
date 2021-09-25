@@ -63,8 +63,7 @@ public class SwerveNetworkTable extends SubsystemBase {
 
     public void setCommand()
     {
-        VelocityState state = ntCommandListener.getCommand();
-        m_swerve.setVelocity(state.getTranslationDirection(), state.getTranslationSpeed(), state.getRotationVelocity(), state.isFieldCentric());
+        m_swerve.setVelocity(ntCommandListener.getCommand());
     }
 
     public boolean isConnected()

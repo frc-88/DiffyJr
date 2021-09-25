@@ -15,7 +15,7 @@ public class CommandListener implements TableEntryListener {
   private VelocityState command;
 
   public CommandListener() {
-    
+    command = new VelocityState(0.0, 0.0, 0.0, false);
   }
 
   public boolean isActive()
