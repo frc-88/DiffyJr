@@ -29,7 +29,6 @@ public class Robot extends TimedRobot {
 
     // private static final double MAX_SPEED = 14.7;
     // private static final double MAX_ROTATION = 360.;
-    private int counter = 0;
 
     @Override
     public void robotInit() {

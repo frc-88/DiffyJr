@@ -32,7 +32,7 @@ public class PingListener implements TableEntryListener {
   @Override
   public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
     ping_time = value.getDouble();
-    System.out.println("Got ping");
+    // System.out.println("Got ping");
     m_table.getEntry("pingResponse").setDouble(ping_time);
   }
 }

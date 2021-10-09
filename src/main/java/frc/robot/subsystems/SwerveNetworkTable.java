@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team88.swerve.SwerveController;
 import frc.team88.swerve.motion.state.VelocityState;
 import frc.robot.listeners.PingListener;
+import frc.robot.listeners.SetOdomListener;
 import frc.robot.listeners.CommandListener;
 
 public class SwerveNetworkTable extends SubsystemBase {
@@ -22,6 +23,7 @@ public class SwerveNetworkTable extends SubsystemBase {
     private NetworkTable table;
     private NetworkTable clientTable;
     private NetworkTable commandsTable;
+    private NetworkTable setOdomTable;
     private NetworkTableEntry clientTimestamp;
     private NetworkTableEntry hostTimestamp;
 
@@ -32,6 +34,7 @@ public class SwerveNetworkTable extends SubsystemBase {
 
     private PingListener ntPingListener;
     private CommandListener ntCommandListener;
+    private SetOdomListener setOdomListener;
 
     public SwerveNetworkTable(SwerveController swerve)
     {
@@ -40,6 +43,7 @@ public class SwerveNetworkTable extends SubsystemBase {
         table = NetworkTableInstance.getDefault().getTable(rootTableName);  // Data and commands from the RoboRIO
         clientTable = table.getSubTable("ROS");  // Data from the Jetson
         commandsTable = table.getSubTable("commands");  // Commands from the Jetson
+        setOdomTable = clientTable.getSubTable("setOdom");
         clientTimestamp = clientTable.getEntry("timestamp");
         hostTimestamp = table.getEntry("timestamp");
 
@@ -54,6 +58,10 @@ public class SwerveNetworkTable extends SubsystemBase {
         ntCommandListener = new CommandListener();
         ntCommandListener.setTable(commandsTable);
         commandsTable.addEntryListener("timestamp", ntCommandListener, EntryListenerFlags.kUpdate);
+
+        setOdomListener = new SetOdomListener(m_swerve);
+        setOdomListener.setTable(setOdomTable);
+        setOdomTable.addEntryListener("timestamp", setOdomListener, EntryListenerFlags.kUpdate);
     }
 
     private long getTime()

@@ -10,7 +10,7 @@ import frc.team88.swerve.motion.state.VelocityState;
 /** Handles callbacks for when the command subtable is updated */
 public class CommandListener implements TableEntryListener {
   private NetworkTable m_table;
-  private long lastActiveTime;
+  private long lastActiveTime = 0;
   private long activeTimeThreshold = 5_000_000;  // microseconds
   private VelocityState command;
 
