@@ -26,8 +26,11 @@ public class SwerveNetworkTable extends SubsystemBase {
     private NetworkTable setOdomTable;
     private NetworkTableEntry clientTimestamp;
     private NetworkTableEntry hostTimestamp;
+    private NetworkTableEntry pingEntry;
 
     private NetworkTable driverStationTable;
+    private NetworkTableEntry isFMSAttachedEntry;
+    private NetworkTableEntry getMatchTimeEntry;
 
     private final long clientConnectedTimeout = 1_000_000;  // microseconds
     private final String rootTableName = "swerveLibrary";
@@ -35,6 +38,8 @@ public class SwerveNetworkTable extends SubsystemBase {
     private PingListener ntPingListener;
     private CommandListener ntCommandListener;
     private SetOdomListener setOdomListener;
+
+    private DriverStation m_driverStationInstance;
 
     public SwerveNetworkTable(SwerveController swerve)
     {
@@ -53,7 +58,8 @@ public class SwerveNetworkTable extends SubsystemBase {
 
         ntPingListener = new PingListener();
         ntPingListener.setTable(table);
-        clientTable.addEntryListener("ping", ntPingListener, EntryListenerFlags.kUpdate);
+        // clientTable.addEntryListener("ping", ntPingListener, EntryListenerFlags.kUpdate);
+        pingEntry = clientTable.getEntry("ping");
 
         ntCommandListener = new CommandListener();
         ntCommandListener.setTable(commandsTable);
@@ -62,6 +68,11 @@ public class SwerveNetworkTable extends SubsystemBase {
         setOdomListener = new SetOdomListener(m_swerve);
         setOdomListener.setTable(setOdomTable);
         setOdomTable.addEntryListener("timestamp", setOdomListener, EntryListenerFlags.kUpdate);
+
+        isFMSAttachedEntry = driverStationTable.getEntry("isFMSAttached");
+        getMatchTimeEntry = driverStationTable.getEntry("getMatchTime");
+
+        m_driverStationInstance = DriverStation.getInstance();
     }
 
     private long getTime()
@@ -88,11 +99,15 @@ public class SwerveNetworkTable extends SubsystemBase {
     public void periodic()
     {
         hostTimestamp.setNumber(getTime());
+
+        double pingTime = pingEntry.getDouble(0.0);
+        ntPingListener.setPingResponse(pingTime);
+
         if (!isConnected()) {
             return;
         }
         // Driver Station
-        driverStationTable.getEntry("isFMSAttached").setBoolean(DriverStation.getInstance().isFMSAttached());
-        driverStationTable.getEntry("getMatchTime").setDouble(DriverStation.getInstance().getMatchTime());
+        isFMSAttachedEntry.setBoolean(m_driverStationInstance.isFMSAttached());
+        getMatchTimeEntry.setDouble(m_driverStationInstance.getMatchTime());
     }
 }
