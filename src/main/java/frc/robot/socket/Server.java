@@ -3,31 +3,49 @@ package frc.robot.socket;
 import java.net.*;
 import java.io.*;
 
-public class Server {
+public class Server extends Thread {
     private ServerSocket serverSocket;
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
 
-    public void start(int port) throws IOException {
+    public Server(int port) throws IOException {
         System.out.println("Starting server");
         serverSocket = new ServerSocket(port);
         clientSocket = serverSocket.accept();
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        
-        while (true)
-        {
-            String message = in.readLine();
-            if (message == null) {
+    }
+
+    public void run()
+    {
+        while (true) {
+            if (!update()) {
                 break;
             }
-            System.out.println("Message received: " + message);
-            out.println(message);
         }
     }
 
-    public void stop() throws IOException {
+    public boolean update()
+    {
+        String message;
+        try {
+            message = in.readLine();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
+        }
+        if (message == null) {
+            return false;
+        }
+        System.out.println("Message received: " + message);
+        out.println(message);
+
+        return true;
+    }
+
+    public void close() throws IOException {
         in.close();
         out.close();
         clientSocket.close();
@@ -35,10 +53,14 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        Server server = new Server();
         try {
-            server.start(8080);
+            Server server = new Server(8080);
+            server.start();
+            while (true)  { Thread.sleep(1000); }
         } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

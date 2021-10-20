@@ -28,6 +28,7 @@ public class PingListener implements TableEntryListener {
   public void setTable(NetworkTable table) {
     m_table = table;
     pingResponseEntry = m_table.getEntry("pingResponse");
+    pingResponseEntry.setDouble(0.0);
   }
 
   public void setPingResponse(double ping_response) {

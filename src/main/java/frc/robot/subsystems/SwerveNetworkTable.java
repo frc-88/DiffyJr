@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team88.swerve.SwerveController;
-import frc.team88.swerve.motion.state.VelocityState;
 import frc.robot.listeners.PingListener;
 import frc.robot.listeners.SetOdomListener;
 import frc.robot.listeners.CommandListener;
@@ -43,6 +42,8 @@ public class SwerveNetworkTable extends SubsystemBase {
 
     public SwerveNetworkTable(SwerveController swerve)
     {
+        super();
+
         m_swerve = swerve;
 
         table = NetworkTableInstance.getDefault().getTable(rootTableName);  // Data and commands from the RoboRIO
@@ -57,7 +58,7 @@ public class SwerveNetworkTable extends SubsystemBase {
         hostTimestamp.setNumber(getTime());
 
         ntPingListener = new PingListener();
-        ntPingListener.setTable(table);
+        ntPingListener.setTable(clientTable);
         // clientTable.addEntryListener("ping", ntPingListener, EntryListenerFlags.kUpdate);
         pingEntry = clientTable.getEntry("ping");
 
@@ -95,11 +96,8 @@ public class SwerveNetworkTable extends SubsystemBase {
         return isConnected() && ntCommandListener.isActive();
     }
 
-    @Override
-    public void periodic()
+    public void update()
     {
-        hostTimestamp.setNumber(getTime());
-
         double pingTime = pingEntry.getDouble(0.0);
         ntPingListener.setPingResponse(pingTime);
 

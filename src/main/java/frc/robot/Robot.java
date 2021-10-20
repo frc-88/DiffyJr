@@ -7,11 +7,13 @@
 
 package frc.robot;
 
+import java.io.IOException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.socket.Server;
 import frc.robot.subsystems.SwerveNetworkTable;
 import frc.team88.swerve.SwerveController;
 import frc.team88.swerve.motion.state.VelocityState;
@@ -26,6 +28,7 @@ import frc.team88.swerve.motion.state.VelocityState;
 public class Robot extends TimedRobot {
     private SwerveController swerve;
     private SwerveNetworkTable m_swerve_table;
+    private Server socketServer;
 
     // private static final double MAX_SPEED = 14.7;
     // private static final double MAX_ROTATION = 360.;
@@ -36,12 +39,20 @@ public class Robot extends TimedRobot {
         this.swerve.setGyroYaw(0);
 
         m_swerve_table = new SwerveNetworkTable(swerve);
+        try {
+            socketServer = new Server(8080);
+            socketServer.start();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void robotPeriodic() {
         // Happens after mode periodic method
         this.swerve.update();
+        m_swerve_table.update();
     }
 
     public void disabledInit() {
