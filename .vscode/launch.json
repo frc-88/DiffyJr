@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Launch ThreadedEchoServer",
+      "request": "launch",
+      "mainClass": "frc.robot.socket.ThreadedEchoServer",
+      "projectName": "DiffyJr"
+    },
+    {
+      "type": "java",
       "name": "Launch Server",
       "request": "launch",
       "mainClass": "frc.robot.socket.Server",
