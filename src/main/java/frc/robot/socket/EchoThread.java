@@ -71,7 +71,7 @@ public class EchoThread extends Thread {
         // CharBuffer buffer = CharBuffer.allocate(buffer_size);
         while (true) {
             try {
-                int charsIn = inp.read(buffer);
+                int charsIn = inp.read(buffer, 0, 1024);
                 // int charsIn = brinp.read(buffer);
                 System.out.println("Read " + charsIn + " characters");
                 // System.out.println("Read " + bytes.length + " characters");

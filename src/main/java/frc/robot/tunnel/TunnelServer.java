@@ -1,78 +1,98 @@
 package frc.robot.tunnel;
 
-import java.io.PrintWriter;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+
+import frc.team88.swerve.SwerveController;
 
 public class TunnelServer extends Thread {
-    private int tunnelPort;
-    private ServerSocket serverSocket;
-    private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
-    private boolean isSocketInitialized = false;
-    
-    public TunnelServer(int port) {
-        tunnelPort = port;
+
+    private int port = 0;
+    private SwerveController m_swerve;
+    private ArrayList<TunnelThread> tunnels;
+
+    public TunnelServer(SwerveController swerve, int port)
+    {
+        tunnels = new ArrayList<TunnelThread>();
+        this.port = port;
+        this.m_swerve = swerve;
     }
 
-    public void run()
+    public void update()
     {
-        while (true)
+        setCommandIfActive();
+        sendOdometry();
+    }
+
+    private void sendOdometry()
+    {
+        for (int index = tunnels.size() - 1; index >= 0; index--)
         {
-            if (checkSocket())
-            {
-                String message;
-                try {
-                    message = in.readLine();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                    flagSocketClosed();
-                    continue;
-                }
-                if (message == null) {
-                    flagSocketClosed();
-                    continue;
-                }
+            TunnelThread tunnel = tunnels.get(index);
+            if (tunnel.isAlive()) {
+                tunnel.sendOdometry();
             }
         }
     }
 
-    private void write(String message)
+    private void setCommandIfActive()
     {
-        if (!isSocketInitialized) {
-            return;
+        for (int index = tunnels.size() - 1; index >= 0; index--)
+        {
+            TunnelThread tunnel = tunnels.get(index);
+            if (tunnel.isCommandActive()) {
+                m_swerve.setVelocity(tunnel.getCommand());
+                break;
+            }
         }
-        out.println(message);
-
-    }
-    private void flagSocketClosed()
-    {
-        isSocketInitialized = false;
     }
 
-    private boolean checkSocket()
+    private void cleanUpThreads()
     {
-        if (isSocketInitialized) {
-            return true;
+        for (int index = 0; index < tunnels.size(); index++)
+        {
+            if (!tunnels.get(index).isAlive()) {
+                tunnels.remove(index);
+                index--;
+            }
+        }
+    }
+
+    @Override
+    public void run()
+    {
+        ServerSocket serverSocket = null;
+        Socket socket = null;
+
+        try {
+            serverSocket = new ServerSocket(port);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         try
         {
-            serverSocket = new ServerSocket(tunnelPort);
-            clientSocket = serverSocket.accept();
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            isSocketInitialized = true;
-            return true;
+            while (true) {
+                try {
+                    socket = serverSocket.accept();
+                } catch (IOException e) {
+                    System.out.println("I/O error: " + e);
+                }
+                cleanUpThreads();
+
+                // new threads for a client
+                TunnelThread tunnel = new TunnelThread(m_swerve, socket);
+                tunnels.add(tunnel);
+                tunnel.start();
+            }
         }
-        catch (IOException e) {
-            e.printStackTrace();
-            isSocketInitialized = false;
-            return false;
+        finally {
+            try {
+                serverSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

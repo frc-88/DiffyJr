@@ -8,15 +8,11 @@
 package frc.robot;
 
 import java.io.IOException;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import frc.robot.socket.Server;
 import frc.robot.subsystems.SwerveNetworkTable;
+import frc.robot.tunnel.TunnelServer;
 import frc.team88.swerve.SwerveController;
-import frc.team88.swerve.motion.state.VelocityState;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -28,7 +24,7 @@ import frc.team88.swerve.motion.state.VelocityState;
 public class Robot extends TimedRobot {
     private SwerveController swerve;
     private SwerveNetworkTable m_swerve_table;
-    private Server socketServer;
+    private TunnelServer tunnel;
 
     // private static final double MAX_SPEED = 14.7;
     // private static final double MAX_ROTATION = 360.;
@@ -39,13 +35,8 @@ public class Robot extends TimedRobot {
         this.swerve.setGyroYaw(0);
 
         m_swerve_table = new SwerveNetworkTable(swerve);
-        try {
-            socketServer = new Server(8080);
-            socketServer.start();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        tunnel = new TunnelServer(swerve, 3000);
+        tunnel.start();
     }
 
     @Override
@@ -77,10 +68,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        if (m_swerve_table.isCommandActive()) {
-            m_swerve_table.setCommand();
-        }
+        // if (m_swerve_table.isCommandActive()) {
+        //     m_swerve_table.setCommand();
+        // }
         // swerve.setVelocity(new VelocityState(0.0, 0.0, 10.0, false));
+        tunnel.update();
     }
 
     @Override

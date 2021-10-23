@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Launch TunnelProtocol",
+      "request": "launch",
+      "mainClass": "frc.robot.tunnel.TunnelProtocol",
+      "projectName": "DiffyJr"
+    },
+    {
+      "type": "java",
       "name": "Launch ThreadedEchoServer",
       "request": "launch",
       "mainClass": "frc.robot.socket.ThreadedEchoServer",
