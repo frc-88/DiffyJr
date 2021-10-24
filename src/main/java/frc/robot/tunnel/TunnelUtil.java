@@ -57,6 +57,22 @@ public class TunnelUtil {
         }
         return s;
     }
+
+    public static int toInt(byte[] buffer) {
+        ByteBuffer wrapped = ByteBuffer.wrap(buffer);
+        wrapped.order(ByteOrder.BIG_ENDIAN);
+        return wrapped.getInt();
+    }
+    public static short toShort(byte[] buffer) {
+        ByteBuffer wrapped = ByteBuffer.wrap(buffer);
+        wrapped.order(ByteOrder.BIG_ENDIAN);
+        return wrapped.getShort();
+    }
+    public static double toDouble(byte[] buffer) {
+        ByteBuffer wrapped = ByteBuffer.wrap(buffer);
+        wrapped.order(ByteOrder.LITTLE_ENDIAN);
+        return wrapped.getDouble();
+    }
     public static byte[] toUInt16Bytes(short number)
     {
         ByteBuffer dbuf = ByteBuffer.allocate(2);

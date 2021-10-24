@@ -21,6 +21,8 @@ public class TunnelThread extends Thread {
     InputStream input = null;
     OutputStream output = null;
 
+    VelocityState swerveCommand = new VelocityState(0.0, 0.0, 0.0, false);;
+
     public TunnelThread(SwerveController swerve, Socket clientSocket) {
         this.socket = clientSocket;
         this.m_swerve = swerve;
@@ -44,7 +46,10 @@ public class TunnelThread extends Thread {
     public void sendOdometry()
     {
         OdomState odom = m_swerve.getOdometry();
-        
+        writePacket("odom",
+            odom.getXPosition(), odom.getYPosition(), odom.getTheta(),
+            odom.getXVelocity(), odom.getYVelocity(), odom.getThetaVelocity()
+        );
     }
 
     public boolean isCommandActive()
@@ -52,19 +57,44 @@ public class TunnelThread extends Thread {
         return false;
     }
 
-    public VelocityState getCommand()
-    {
-        return new VelocityState(0.0, 0.0, 0.0, false);
+    public VelocityState getCommand() {
+        return swerveCommand;
     }
 
-    private void writeBuffer(byte[] buffer, int start, int length) throws IOException
+    private void writePacket(String category, Object... objects) {
+        byte[] packet = protocol.makePacket(category, objects);
+        
+        try {
+            writeBuffer(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Failed while writing packet: " + TunnelUtil.packetToString(packet));
+        }
+    }
+
+    private void writeBuffer(byte[] buffer) throws IOException
     {
         if (!Objects.nonNull(output)) {
             System.out.println("Output stream is null! Skipping write.");
             return;
         }
-        output.write(buffer, start, length);
+        output.write(buffer, 0, buffer.length);
         output.flush();
+    }
+
+    private void packetCallback(PacketResult result) {
+        String category = result.getCategory();
+        if (category.equals("cmd")) {
+            swerveCommand = new VelocityState(
+                (double)result.get(0),
+                (double)result.get(1),
+                (double)result.get(2),
+                false
+            );
+        }
+        else if (category.equals("ping")) {
+            writePacket("ping", (double)result.get(0));
+        }
     }
 
     public void run()
@@ -88,6 +118,20 @@ public class TunnelThread extends Thread {
                     return;
                 }
                 buffer_index = protocol.parseBuffer(buffer);
+                PacketResult result;
+                do {
+                    result = protocol.popResult();
+                    if (protocol.isCodeError(result.getErrorCode())) {
+                        System.out.println(String.format("Encountered error code %d. Buffer: %s",
+                            result.getErrorCode(),
+                            TunnelUtil.packetToString(buffer))
+                        );
+                        continue;
+                    }
+                    packetCallback(result);
+                }
+                while (result.getErrorCode() != -1);
+
             } catch (IOException e) {
                 e.printStackTrace();
                 return;

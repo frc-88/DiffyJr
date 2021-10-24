@@ -70,7 +70,9 @@ public class TunnelServer extends Thread {
             serverSocket = new ServerSocket(port);
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
+        System.out.println("Socket is open");
         try
         {
             while (true) {
