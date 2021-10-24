@@ -22,7 +22,6 @@ public class TunnelServer extends Thread {
 
     public void update()
     {
-        setCommandIfActive();
         sendOdometry();
     }
 
@@ -31,13 +30,13 @@ public class TunnelServer extends Thread {
         for (int index = tunnels.size() - 1; index >= 0; index--)
         {
             TunnelThread tunnel = tunnels.get(index);
-            if (tunnel.isAlive()) {
+            if (tunnel.isAlive() && tunnel.isOpen()) {
                 tunnel.sendOdometry();
             }
         }
     }
 
-    private void setCommandIfActive()
+    public void setCommandIfActive()
     {
         for (int index = tunnels.size() - 1; index >= 0; index--)
         {
@@ -53,7 +52,7 @@ public class TunnelServer extends Thread {
     {
         for (int index = 0; index < tunnels.size(); index++)
         {
-            if (!tunnels.get(index).isAlive()) {
+            if (!tunnels.get(index).isAlive() || !tunnels.get(index).isOpen()) {
                 tunnels.remove(index);
                 index--;
             }
@@ -91,6 +90,7 @@ public class TunnelServer extends Thread {
         }
         finally {
             try {
+                System.out.println("Closing socket");
                 serverSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();

@@ -3,11 +3,11 @@ package frc.robot.socket;
 import java.net.*;
 import java.io.*;
 
-public class ThreadedEchoServer {
+public class ThreadedEchoServer extends Thread {
 
     static final int PORT = 3000;
 
-    public static void main(String args[]) {
+    public void run() {
         ServerSocket serverSocket = null;
         Socket socket = null;
 

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -18,10 +20,16 @@ public class TunnelThread extends Thread {
     private SwerveController m_swerve;
     private TunnelProtocol protocol;
 
-    InputStream input = null;
-    OutputStream output = null;
+    private InputStream input = null;
+    private OutputStream output = null;
+    private boolean isOpen = false;
 
-    VelocityState swerveCommand = new VelocityState(0.0, 0.0, 0.0, false);;
+    private int buffer_size = 1024;
+    private byte[] buffer = new byte[buffer_size];
+    private int buffer_index = 0;
+    
+
+    private VelocityState swerveCommand = new VelocityState(0.0, 0.0, 0.0, false);;
 
     public TunnelThread(SwerveController swerve, Socket clientSocket) {
         this.socket = clientSocket;
@@ -37,9 +45,11 @@ public class TunnelThread extends Thread {
         try {
             input = socket.getInputStream();
             output = socket.getOutputStream();
+            isOpen = true;
 
         } catch (IOException e) {
             e.printStackTrace();
+            isOpen = false;
         }
     }
 
@@ -63,23 +73,35 @@ public class TunnelThread extends Thread {
 
     private void writePacket(String category, Object... objects) {
         byte[] packet = protocol.makePacket(category, objects);
+        System.out.println("Writing: " + TunnelUtil.packetToString(packet));
         
         try {
             writeBuffer(packet);
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Failed while writing packet: " + TunnelUtil.packetToString(packet));
+            isOpen = false;
         }
+    }
+
+    public boolean isOpen() {
+        return isOpen;
     }
 
     private void writeBuffer(byte[] buffer) throws IOException
     {
-        if (!Objects.nonNull(output)) {
-            System.out.println("Output stream is null! Skipping write.");
+        if (!Objects.nonNull(output) || !isOpen) {
+            System.out.println("Socket is closed! Skipping write.");
             return;
         }
-        output.write(buffer, 0, buffer.length);
-        output.flush();
+        try {
+            output.write(buffer, 0, buffer.length);
+            output.flush();
+        }
+        catch (SocketException e) {
+            e.printStackTrace();
+            isOpen = false;
+        }
     }
 
     private void packetCallback(PacketResult result) {
@@ -93,7 +115,7 @@ public class TunnelThread extends Thread {
             );
         }
         else if (category.equals("ping")) {
-            writePacket("ping", (double)result.get(0));
+            writePacket("ping", (double)result.get(0), (int)buffer_index);
         }
     }
 
@@ -103,29 +125,41 @@ public class TunnelThread extends Thread {
             return;
         }
         
-        int buffer_size = 1024;
-        byte[] buffer = new byte[buffer_size];
-        int buffer_index = 0;
-        
         while (true) {
             try {
-                int charsIn = input.read(buffer, buffer_index, buffer_size - buffer_index);
-                System.out.println("Read " + charsIn + " characters");
-                System.out.println("Received: " + TunnelUtil.packetToString(buffer, charsIn));
-                if (charsIn == -1) {
+                int num_chars_read = input.read(buffer, buffer_index, buffer_size - buffer_index);
+                if (num_chars_read == 0) {
+                    continue;
+                }
+                // System.out.println("Read " + charsIn + " characters");
+                if (num_chars_read == -1) {
                     System.out.println("Closing client");
                     socket.close();
                     return;
                 }
-                buffer_index = protocol.parseBuffer(buffer);
+                // System.out.println("Received: " + TunnelUtil.packetToString(buffer, charsIn));
+                // System.out.println("Buffer: " + TunnelUtil.packetToString(buffer));
+                buffer_index = protocol.parseBuffer(Arrays.copyOfRange(buffer, 0, buffer_index + num_chars_read));
+                System.out.println("Index: " + buffer_index);
+                if (buffer_index > 0)
+                {
+                    for (int index = buffer_index, shifted_index = 0; index < buffer.length; index++, shifted_index++) {
+                        buffer[shifted_index] = buffer[index];
+                    }
+                    buffer_index = 0;
+                }
+                Thread.sleep(20);
+                
                 PacketResult result;
                 do {
                     result = protocol.popResult();
+                    if (result.getErrorCode() == TunnelProtocol.NULL_ERROR) {
+                        continue;
+                    }
                     if (protocol.isCodeError(result.getErrorCode())) {
-                        System.out.println(String.format("Encountered error code %d. Buffer: %s",
-                            result.getErrorCode(),
-                            TunnelUtil.packetToString(buffer))
-                        );
+                        System.out.println(String.format("Encountered error code %d.",
+                            result.getErrorCode()
+                        ));
                         continue;
                     }
                     packetCallback(result);
@@ -134,7 +168,11 @@ public class TunnelThread extends Thread {
 
             } catch (IOException e) {
                 e.printStackTrace();
+                isOpen = false;
                 return;
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
     }

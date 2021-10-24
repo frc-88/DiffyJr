@@ -12,30 +12,30 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class TunnelProtocol {
-    private final char PACKET_START_0 = 0x12;
-    private final char PACKET_START_1 = 0x13;
-    private final char PACKET_STOP = '\n';
-    private final char PACKET_SEP = '\t';
-    private final int MAX_PACKET_LEN = 128;
-    private final int MIN_PACKET_LEN = 13;
-    private final int MAX_SEGMENT_LEN = 64;
-    private final int CHECKSUM_START_INDEX = 4;
-    private final int LENGTH_START_INDEX = 2;
-    private final int LENGTH_BYTE_LENGTH = 2;
+    public static final char PACKET_START_0 = 0x12;
+    public static final char PACKET_START_1 = 0x13;
+    public static final char PACKET_STOP = '\n';
+    public static final char PACKET_SEP = '\t';
+    public static final int MAX_PACKET_LEN = 128;
+    public static final int MIN_PACKET_LEN = 13;
+    public static final int MAX_SEGMENT_LEN = 64;
+    public static final int CHECKSUM_START_INDEX = 4;
+    public static final int LENGTH_START_INDEX = 2;
+    public static final int LENGTH_BYTE_LENGTH = 2;
 
-    private final int NULL_ERROR = -1;
-    private final int NO_ERROR = 0;
-    private final int PACKET_0_ERROR = 1;
-    private final int PACKET_1_ERROR = 2;
-    private final int PACKET_TOO_SHORT_ERROR = 3;
-    private final int CHECKSUMS_DONT_MATCH_ERROR = 4;
-    private final int PACKET_COUNT_NOT_FOUND_ERROR = 5;
-    private final int PACKET_COUNT_NOT_SYNCED_ERROR = 6;
-    private final int PACKET_CATEGORY_ERROR = 7;
-    private final int INVALID_FORMAT_ERROR = 8;
-    private final int PACKET_STOP_ERROR = 9;
-    private final int SEGMENT_TOO_LONG_ERROR = 10;
-    private final int PACKET_TIMEOUT_ERROR = 11;
+    public static final int NULL_ERROR = -1;
+    public static final int NO_ERROR = 0;
+    public static final int PACKET_0_ERROR = 1;
+    public static final int PACKET_1_ERROR = 2;
+    public static final int PACKET_TOO_SHORT_ERROR = 3;
+    public static final int CHECKSUMS_DONT_MATCH_ERROR = 4;
+    public static final int PACKET_COUNT_NOT_FOUND_ERROR = 5;
+    public static final int PACKET_COUNT_NOT_SYNCED_ERROR = 6;
+    public static final int PACKET_CATEGORY_ERROR = 7;
+    public static final int INVALID_FORMAT_ERROR = 8;
+    public static final int PACKET_STOP_ERROR = 9;
+    public static final int SEGMENT_TOO_LONG_ERROR = 10;
+    public static final int PACKET_TIMEOUT_ERROR = 11;
 
     private int read_packet_num = -1;
     private int write_packet_num = 0;
@@ -126,6 +126,7 @@ public class TunnelProtocol {
         switch (error_code) {
             case NO_ERROR:
             case PACKET_COUNT_NOT_SYNCED_ERROR:
+            case NULL_ERROR:
                 return false;
             default:
                 return true;
@@ -135,9 +136,10 @@ public class TunnelProtocol {
     {
         // returns where to move the start index to
         // TODO enforce max packet length
-        int packet_start = 0;
+        int last_packet_index = 0;
         int index;
         for (index = 0; index < buffer.length; index++) {
+            int packet_start = index;
             if ((char)buffer[index] != PACKET_START_0) {
                 // System.out.println(buffer[index] + " is not PACKET_START_0");
                 continue;
@@ -177,11 +179,15 @@ public class TunnelProtocol {
                 // System.out.println("Buffer does not end with PACKET_STOP");
                 continue;
             }
-            PacketResult result = parsePacket(Arrays.copyOfRange(buffer, packet_start, index + 1));
+            index++;
+            last_packet_index = index;
+            byte[] packet = Arrays.copyOfRange(buffer, packet_start, index);
+            System.out.println("Found a packet: " + TunnelUtil.packetToString(packet));
+            PacketResult result = parsePacket(packet);
             resultQueue.add(result);
         }
 
-        return index;
+        return last_packet_index;
     }
 
     private long getTime()

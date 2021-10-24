@@ -10,7 +10,9 @@ package frc.robot;
 import java.io.IOException;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.socket.ThreadedEchoServer;
 import frc.robot.subsystems.SwerveNetworkTable;
+import frc.robot.tunnel.TunnelDataRelayThread;
 import frc.robot.tunnel.TunnelServer;
 import frc.team88.swerve.SwerveController;
 
@@ -25,6 +27,8 @@ public class Robot extends TimedRobot {
     private SwerveController swerve;
     private SwerveNetworkTable m_swerve_table;
     private TunnelServer tunnel;
+    private TunnelDataRelayThread data_relay_thread;
+    private ThreadedEchoServer echo_server;
 
     // private static final double MAX_SPEED = 14.7;
     // private static final double MAX_ROTATION = 360.;
@@ -35,8 +39,13 @@ public class Robot extends TimedRobot {
         this.swerve.setGyroYaw(0);
 
         m_swerve_table = new SwerveNetworkTable(swerve);
+        // echo_server = new ThreadedEchoServer();
+        // echo_server.start();
         tunnel = new TunnelServer(swerve, 3000);
         tunnel.start();
+
+        data_relay_thread = new TunnelDataRelayThread(tunnel);
+        data_relay_thread.start();
     }
 
     @Override
@@ -68,11 +77,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        tunnel.setCommandIfActive();
         // if (m_swerve_table.isCommandActive()) {
         //     m_swerve_table.setCommand();
         // }
         // swerve.setVelocity(new VelocityState(0.0, 0.0, 10.0, false));
-        tunnel.update();
     }
 
     @Override
