@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
+import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.tunnel.TunnelUtil;
 
 import frc.team88.swerve.SwerveController;
@@ -26,10 +27,11 @@ public class TunnelThread extends Thread {
 
     private int buffer_size = 1024;
     private byte[] buffer = new byte[buffer_size];
-    private int buffer_index = 0;
+    private int unparsed_index = 0;
     
-
-    private VelocityState swerveCommand = new VelocityState(0.0, 0.0, 0.0, false);;
+    private long last_command_time = 0;
+    private final long ACTIVE_TIME_THRESHOLD = 1_000_000;  // microseconds
+    private VelocityState swerveCommand = new VelocityState(0.0, 0.0, 0.0, false);
 
     public TunnelThread(SwerveController swerve, Socket clientSocket) {
         this.socket = clientSocket;
@@ -62,9 +64,8 @@ public class TunnelThread extends Thread {
         );
     }
 
-    public boolean isCommandActive()
-    {
-        return false;
+    public boolean isCommandActive() {
+        return isOpen() && getTime() - last_command_time < ACTIVE_TIME_THRESHOLD;
     }
 
     public VelocityState getCommand() {
@@ -73,7 +74,7 @@ public class TunnelThread extends Thread {
 
     private void writePacket(String category, Object... objects) {
         byte[] packet = protocol.makePacket(category, objects);
-        System.out.println("Writing: " + TunnelUtil.packetToString(packet));
+        // System.out.println("Writing: " + TunnelUtil.packetToString(packet));
         
         try {
             writeBuffer(packet);
@@ -113,10 +114,19 @@ public class TunnelThread extends Thread {
                 (double)result.get(2),
                 false
             );
+            resetCommandTimer();
         }
         else if (category.equals("ping")) {
-            writePacket("ping", (double)result.get(0), (int)buffer_index);
+            writePacket("ping", (double)result.get(0));
         }
+    }
+
+    private long getTime() {
+        return RobotController.getFPGATime();
+    }
+    
+    private void resetCommandTimer() {
+        last_command_time = getTime();
     }
 
     public void run()
@@ -127,7 +137,7 @@ public class TunnelThread extends Thread {
         
         while (true) {
             try {
-                int num_chars_read = input.read(buffer, buffer_index, buffer_size - buffer_index);
+                int num_chars_read = input.read(buffer, unparsed_index, buffer_size - unparsed_index);
                 if (num_chars_read == 0) {
                     continue;
                 }
@@ -139,16 +149,14 @@ public class TunnelThread extends Thread {
                 }
                 // System.out.println("Received: " + TunnelUtil.packetToString(buffer, charsIn));
                 // System.out.println("Buffer: " + TunnelUtil.packetToString(buffer));
-                buffer_index = protocol.parseBuffer(Arrays.copyOfRange(buffer, 0, buffer_index + num_chars_read));
-                System.out.println("Index: " + buffer_index);
-                if (buffer_index > 0)
+                int last_parsed_index = protocol.parseBuffer(Arrays.copyOfRange(buffer, 0, unparsed_index + num_chars_read));
+                if (last_parsed_index > 0)
                 {
-                    for (int index = buffer_index, shifted_index = 0; index < buffer.length; index++, shifted_index++) {
+                    for (int index = last_parsed_index, shifted_index = 0; index < buffer.length; index++, shifted_index++) {
                         buffer[shifted_index] = buffer[index];
                     }
-                    buffer_index = 0;
                 }
-                Thread.sleep(20);
+                unparsed_index = unparsed_index + num_chars_read - last_parsed_index;
                 
                 PacketResult result;
                 do {
@@ -170,9 +178,6 @@ public class TunnelThread extends Thread {
                 e.printStackTrace();
                 isOpen = false;
                 return;
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
         }
     }

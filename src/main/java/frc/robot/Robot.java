@@ -15,6 +15,7 @@ import frc.robot.subsystems.SwerveNetworkTable;
 import frc.robot.tunnel.TunnelDataRelayThread;
 import frc.robot.tunnel.TunnelServer;
 import frc.team88.swerve.SwerveController;
+import frc.team88.swerve.motion.state.VelocityState;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -28,7 +29,7 @@ public class Robot extends TimedRobot {
     private SwerveNetworkTable m_swerve_table;
     private TunnelServer tunnel;
     private TunnelDataRelayThread data_relay_thread;
-    private ThreadedEchoServer echo_server;
+    // private ThreadedEchoServer echo_server;
 
     // private static final double MAX_SPEED = 14.7;
     // private static final double MAX_ROTATION = 360.;
@@ -77,11 +78,13 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        tunnel.setCommandIfActive();
+            if (!tunnel.setCommandIfActive()) {
+            swerve.setVelocity(new VelocityState(0.0, 0.0, 0.0, false));
+        }
         // if (m_swerve_table.isCommandActive()) {
         //     m_swerve_table.setCommand();
         // }
-        // swerve.setVelocity(new VelocityState(0.0, 0.0, 10.0, false));
+        // 
     }
 
     @Override

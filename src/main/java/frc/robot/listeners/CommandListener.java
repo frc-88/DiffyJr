@@ -11,7 +11,7 @@ import frc.team88.swerve.motion.state.VelocityState;
 public class CommandListener implements TableEntryListener {
   private NetworkTable m_table;
   private long lastActiveTime = 0;
-  private long activeTimeThreshold = 5_000_000;  // microseconds
+  private long activeTimeThreshold = 1_000_000;  // microseconds
   private VelocityState command;
 
   public CommandListener() {

@@ -12,7 +12,7 @@ public class TunnelDataRelayThread extends Thread {
         while (true) {
             tunnel.update();
             try {
-                Thread.sleep(1);
+                Thread.sleep(15);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return;

@@ -182,7 +182,7 @@ public class TunnelProtocol {
             index++;
             last_packet_index = index;
             byte[] packet = Arrays.copyOfRange(buffer, packet_start, index);
-            System.out.println("Found a packet: " + TunnelUtil.packetToString(packet));
+            // System.out.println("Found a packet: " + TunnelUtil.packetToString(packet));
             PacketResult result = parsePacket(packet);
             resultQueue.add(result);
         }

@@ -36,16 +36,17 @@ public class TunnelServer extends Thread {
         }
     }
 
-    public void setCommandIfActive()
+    public boolean setCommandIfActive()
     {
         for (int index = tunnels.size() - 1; index >= 0; index--)
         {
             TunnelThread tunnel = tunnels.get(index);
             if (tunnel.isCommandActive()) {
                 m_swerve.setVelocity(tunnel.getCommand());
-                break;
+                return true;
             }
         }
+        return false;
     }
 
     private void cleanUpThreads()
