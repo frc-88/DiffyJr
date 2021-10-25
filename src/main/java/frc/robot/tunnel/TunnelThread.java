@@ -8,6 +8,7 @@ import java.net.SocketException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.tunnel.TunnelUtil;
@@ -32,6 +33,8 @@ public class TunnelThread extends Thread {
     private long last_command_time = 0;
     private final long ACTIVE_TIME_THRESHOLD = 1_000_000;  // microseconds
     private VelocityState swerveCommand = new VelocityState(0.0, 0.0, 0.0, false);
+
+    private static ReentrantLock write_lock = new ReentrantLock();
 
     public TunnelThread(SwerveController swerve, Socket clientSocket) {
         this.socket = clientSocket;
@@ -77,11 +80,16 @@ public class TunnelThread extends Thread {
         // System.out.println("Writing: " + TunnelUtil.packetToString(packet));
         
         try {
+            TunnelThread.write_lock.lock();
             writeBuffer(packet);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             System.out.println("Failed while writing packet: " + TunnelUtil.packetToString(packet));
             isOpen = false;
+        }
+        finally {
+            TunnelThread.write_lock.unlock();
         }
     }
 
@@ -157,6 +165,9 @@ public class TunnelThread extends Thread {
                     }
                 }
                 unparsed_index = unparsed_index + num_chars_read - last_parsed_index;
+                if (unparsed_index >= buffer_size) {
+                    unparsed_index = 0;
+                }
                 
                 PacketResult result;
                 do {
