@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
             if (!tunnel.setCommandIfActive()) {
-            swerve.setVelocity(new VelocityState(0.0, 0.0, 0.0, false));
+            swerve.holdDirection();
         }
         // if (m_swerve_table.isCommandActive()) {
         //     m_swerve_table.setCommand();
