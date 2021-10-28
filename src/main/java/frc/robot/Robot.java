@@ -26,7 +26,7 @@ import frc.team88.swerve.motion.state.VelocityState;
  */
 public class Robot extends TimedRobot {
     private SwerveController swerve;
-    private SwerveNetworkTable m_swerve_table;
+    // private SwerveNetworkTable m_swerve_table;
     private TunnelServer tunnel;
     private TunnelDataRelayThread data_relay_thread;
     // private ThreadedEchoServer echo_server;
@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
         this.swerve = new SwerveController("swerve.toml");
         this.swerve.setGyroYaw(0);
 
-        m_swerve_table = new SwerveNetworkTable(swerve);
+        // m_swerve_table = new SwerveNetworkTable(swerve);
         // echo_server = new ThreadedEchoServer();
         // echo_server.start();
         tunnel = new TunnelServer(swerve, 3000);
@@ -52,8 +52,8 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         // Happens after mode periodic method
-        this.swerve.update();
-        m_swerve_table.update();
+        // this.swerve.update();
+        // m_swerve_table.update();
     }
 
     public void disabledInit() {
@@ -78,7 +78,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-            if (!tunnel.setCommandIfActive()) {
+        if (!tunnel.setCommandIfActive()) {
             swerve.holdDirection();
         }
         // if (m_swerve_table.isCommandActive()) {

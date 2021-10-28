@@ -321,6 +321,7 @@ public class TunnelProtocol {
             this.read_buffer_index += 2;
             if (length >= buffer.length) {
                 System.out.println(String.format("Parsed length %s exceeds buffer length! %s", length, buffer.length));
+                return false;
             }
         }
         this.current_segment = Arrays.copyOfRange(buffer, this.read_buffer_index, this.read_buffer_index + length);
@@ -338,7 +339,7 @@ public class TunnelProtocol {
                 break;
             }
         }
-        if (sep_index == buffer.length) {
+        if (sep_index >= buffer.length) {
             this.current_segment = Arrays.copyOfRange(buffer, this.read_buffer_index, buffer.length);
             this.read_buffer_index = buffer.length;
         }
