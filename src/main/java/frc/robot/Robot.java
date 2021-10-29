@@ -52,7 +52,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         // Happens after mode periodic method
-        // this.swerve.update();
+        this.swerve.update();
         // m_swerve_table.update();
     }
 
