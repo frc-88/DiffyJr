@@ -8,6 +8,7 @@
 package frc.robot;
 
 import java.io.IOException;
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.socket.ThreadedEchoServer;
@@ -15,6 +16,7 @@ import frc.robot.subsystems.SwerveNetworkTable;
 import frc.robot.tunnel.TunnelDataRelayThread;
 import frc.robot.tunnel.TunnelServer;
 import frc.team88.swerve.SwerveController;
+import frc.team88.swerve.module.SwerveModule;
 import frc.team88.swerve.motion.state.VelocityState;
 
 /**
@@ -34,10 +36,19 @@ public class Robot extends TimedRobot {
     // private static final double MAX_SPEED = 14.7;
     // private static final double MAX_ROTATION = 360.;
 
+    public enum SwitchingMode {
+        kAlwaysSwitch,
+        kNeverSwitch,
+        kSmart,
+    }
+
+    private final SwitchingMode SWITCHING_MODE = SwitchingMode.kAlwaysSwitch;
+
     @Override
     public void robotInit() {
         this.swerve = new SwerveController("swerve.toml");
         this.swerve.setGyroYaw(0);
+        this.swerve.setAzimuthWrapBiasStrategy((SwerveModule module) -> diffyJrAzimuthWrapStrategy(module));
 
         // m_swerve_table = new SwerveNetworkTable(swerve);
         // echo_server = new ThreadedEchoServer();
@@ -47,6 +58,27 @@ public class Robot extends TimedRobot {
 
         data_relay_thread = new TunnelDataRelayThread(tunnel);
         data_relay_thread.start();
+    }
+
+    public double diffyJrAzimuthWrapStrategy(SwerveModule module) {
+        switch (SWITCHING_MODE) {
+            case kAlwaysSwitch:
+                return 90;
+            case kNeverSwitch:
+                return 180;
+            case kSmart:
+                double currentVelocity = module.getWheelVelocity();
+                if (module.getAzimuthVelocity() > 30) {
+                    return 180;
+                } else if (currentVelocity < 2.5) {
+                    return 90;
+                } else if (currentVelocity < 5.5) {
+                    return 120;
+                } else {
+                    return 180;
+                }
+        }
+        throw new IllegalStateException("Switching mode is not supported");
     }
 
     @Override
