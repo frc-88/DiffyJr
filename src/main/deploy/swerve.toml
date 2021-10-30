@@ -16,7 +16,7 @@ wheel-diameter-inches = 3.5
 
 azimuth-controller.kP = 15.0
 # azimuth-controller.kI = 0.0
-azimuth-controller.kD = 10.0
+azimuth-controller.kD = 0.0
 # azimuth-controller.kF = 0.0
 # azimuth-controller.i-zone = 0.0
 # azimuth-controller.i-max = 0.0
@@ -26,6 +26,7 @@ azimuth-controller.kD = 10.0
 wheel-controller.kP = 0.5
 wheel-controller.kI = 0.0
 wheel-controller.kD = 0.0
+wheel-controller.kF = 0.0
 # wheel-controller.i-zone = 0.0
 # wheel-controller.i-max = 0.0
 
@@ -42,7 +43,7 @@ wheel-diameter-inches = 3.5
 
 azimuth-controller.kP = 15.0
 # azimuth-controller.kI = 0.0
-azimuth-controller.kD = 10.0
+azimuth-controller.kD = 0.0
 # azimuth-controller.kF = 0.0
 # azimuth-controller.i-zone = 0.0
 # azimuth-controller.i-max = 0.0
@@ -52,6 +53,7 @@ azimuth-controller.kD = 10.0
 wheel-controller.kP = 0.5
 wheel-controller.kI = 0.0
 wheel-controller.kD = 0.0
+wheel-controller.kF = 0.0
 # wheel-controller.i-zone = 0.0
 # wheel-controller.i-max = 0.0
 
@@ -68,7 +70,7 @@ wheel-diameter-inches = 3.5
 
 azimuth-controller.kP = 15.0
 # azimuth-controller.kI = 0.0
-azimuth-controller.kD = 10.0
+azimuth-controller.kD = 0.0
 # azimuth-controller.kF = 0.0
 # azimuth-controller.i-zone = 0.0
 # azimuth-controller.i-max = 0.0
@@ -78,6 +80,7 @@ azimuth-controller.kD = 10.0
 wheel-controller.kP = 0.5
 wheel-controller.kI = 0.0
 wheel-controller.kD = 0.0
+wheel-controller.kF = 0.0
 # wheel-controller.i-zone = 0.0
 # wheel-controller.i-max = 0.0
 
@@ -94,7 +97,7 @@ wheel-diameter-inches = 3.5
 
 azimuth-controller.kP = 15.0
 # azimuth-controller.kI = 0.0
-azimuth-controller.kD = 10.0
+azimuth-controller.kD = 0.0
 # azimuth-controller.kF = 0.0
 # azimuth-controller.i-zone = 0.0
 # azimuth-controller.i-max = 0.0
@@ -104,5 +107,6 @@ azimuth-controller.kD = 10.0
 wheel-controller.kP = 0.5
 wheel-controller.kI = 0.0
 wheel-controller.kD = 0.0
+wheel-controller.kF = 0.0
 # wheel-controller.i-zone = 0.0
 # wheel-controller.i-max = 0.0
