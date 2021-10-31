@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
         // m_swerve_table = new SwerveNetworkTable(swerve);
         // echo_server = new ThreadedEchoServer();
         // echo_server.start();
-        tunnel = new TunnelServer(swerve, 3000);
+        tunnel = new TunnelServer(swerve, 5800);
         tunnel.start();
 
         data_relay_thread = new TunnelDataRelayThread(tunnel);
