@@ -98,9 +98,6 @@ public class SwerveNetworkTable extends SubsystemBase {
 
     public void update()
     {
-        double pingTime = pingEntry.getDouble(0.0);
-        ntPingListener.setPingResponse(pingTime);
-
         if (!isConnected()) {
             return;
         }
