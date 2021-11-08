@@ -7,9 +7,9 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team88.swerve.SwerveController;
 import frc.robot.listeners.PingListener;
 import frc.robot.listeners.SetOdomListener;
+import frc.robot.subsystems.swerve.DiffSwerveChassis;
 import frc.robot.listeners.CommandListener;
 
 public class SwerveNetworkTable extends SubsystemBase {
@@ -17,7 +17,7 @@ public class SwerveNetworkTable extends SubsystemBase {
      * A class to encapsulate shared data interactions and action notifications with the NVidia Jetson.
      */
     
-    private SwerveController m_swerve;
+    private DiffSwerveChassis m_swerve;
 
     private NetworkTable table;
     private NetworkTable clientTable;
@@ -25,7 +25,6 @@ public class SwerveNetworkTable extends SubsystemBase {
     private NetworkTable setOdomTable;
     private NetworkTableEntry clientTimestamp;
     private NetworkTableEntry hostTimestamp;
-    private NetworkTableEntry pingEntry;
 
     private NetworkTable driverStationTable;
     private NetworkTableEntry isFMSAttachedEntry;
@@ -40,7 +39,7 @@ public class SwerveNetworkTable extends SubsystemBase {
 
     private DriverStation m_driverStationInstance;
 
-    public SwerveNetworkTable(SwerveController swerve)
+    public SwerveNetworkTable(DiffSwerveChassis swerve)
     {
         super();
 
@@ -59,8 +58,6 @@ public class SwerveNetworkTable extends SubsystemBase {
 
         ntPingListener = new PingListener();
         ntPingListener.setTable(clientTable);
-        // clientTable.addEntryListener("ping", ntPingListener, EntryListenerFlags.kUpdate);
-        pingEntry = clientTable.getEntry("ping");
 
         ntCommandListener = new CommandListener();
         ntCommandListener.setTable(commandsTable);
@@ -79,11 +76,6 @@ public class SwerveNetworkTable extends SubsystemBase {
     private long getTime()
     {
         return RobotController.getFPGATime();
-    }
-
-    public void setCommand()
-    {
-        m_swerve.setVelocity(ntCommandListener.getCommand());
     }
 
     public boolean isConnected()

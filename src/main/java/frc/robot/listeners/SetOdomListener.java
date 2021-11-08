@@ -4,15 +4,17 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.networktables.TableEntryListener;
-import frc.team88.swerve.SwerveController;
-import frc.team88.swerve.motion.state.OdomState;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import frc.robot.subsystems.swerve.DiffSwerveChassis;
+
 
 /** Handles callbacks for when the command subtable is updated */
 public class SetOdomListener implements TableEntryListener {
   private NetworkTable m_table;
-  private SwerveController m_swerve;
+  private DiffSwerveChassis m_swerve;
 
-  public SetOdomListener(SwerveController swerve) {
+  public SetOdomListener(DiffSwerveChassis swerve) {
     m_swerve = swerve;
   }
 
@@ -35,8 +37,6 @@ public class SetOdomListener implements TableEntryListener {
     double yPosition = m_table.getEntry("yPosition").getDouble(0.0);
     double theta = m_table.getEntry("theta").getDouble(0.0);
 
-    OdomState state = m_swerve.getOdometry();
-    state.setPosition(xPosition, yPosition);
-    state.setTheta(theta);
+    m_swerve.resetOdom(new Pose2d(xPosition, yPosition, new Rotation2d(theta)));
   }
 }
