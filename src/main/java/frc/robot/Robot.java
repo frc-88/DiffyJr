@@ -7,17 +7,11 @@
 
 package frc.robot;
 
-import java.io.IOException;
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj.TimedRobot;
-import frc.robot.socket.ThreadedEchoServer;
-import frc.robot.subsystems.SwerveNetworkTable;
-import frc.robot.tunnel.TunnelDataRelayThread;
-import frc.robot.tunnel.TunnelServer;
+import frc.robot.subsystems.DiffyTunnelInterface;
+import frc.team88.tunnel.TunnelServer;
 import frc.team88.swerve.SwerveController;
 import frc.team88.swerve.module.SwerveModule;
-import frc.team88.swerve.motion.state.VelocityState;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -28,10 +22,8 @@ import frc.team88.swerve.motion.state.VelocityState;
  */
 public class Robot extends TimedRobot {
     private SwerveController swerve;
-    // private SwerveNetworkTable m_swerve_table;
     private TunnelServer tunnel;
-    private TunnelDataRelayThread data_relay_thread;
-    // private ThreadedEchoServer echo_server;
+    private DiffyTunnelInterface diffy_interface;
 
     // private static final double MAX_SPEED = 14.7;
     // private static final double MAX_ROTATION = 360.;
@@ -50,14 +42,9 @@ public class Robot extends TimedRobot {
         this.swerve.setGyroYaw(0);
         this.swerve.setAzimuthWrapBiasStrategy((SwerveModule module) -> diffyJrAzimuthWrapStrategy(module));
 
-        // m_swerve_table = new SwerveNetworkTable(swerve);
-        // echo_server = new ThreadedEchoServer();
-        // echo_server.start();
-        tunnel = new TunnelServer(swerve, 5800);
+        diffy_interface = new DiffyTunnelInterface(this.swerve);
+        tunnel = new TunnelServer(diffy_interface, 5800, 15);
         tunnel.start();
-
-        data_relay_thread = new TunnelDataRelayThread(tunnel);
-        data_relay_thread.start();
     }
 
     public double diffyJrAzimuthWrapStrategy(SwerveModule module) {
@@ -85,7 +72,6 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         // Happens after mode periodic method
         this.swerve.update();
-        // m_swerve_table.update();
     }
 
     public void disabledInit() {
@@ -110,13 +96,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        if (!tunnel.setCommandIfActive()) {
+        if (tunnel.anyClientsAlive() && diffy_interface.isCommandActive()) {
+            swerve.setVelocity(diffy_interface.getCommand());
+        }
+        else {
             swerve.holdDirection();
         }
-        // if (m_swerve_table.isCommandActive()) {
-        //     m_swerve_table.setCommand();
-        // }
-        // 
     }
 
     @Override

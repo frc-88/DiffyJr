@@ -1,4 +1,4 @@
-package frc.robot.tunnel;
+package frc.team88.tunnel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,20 +6,13 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
-import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.tunnel.TunnelUtil;
 
-import frc.team88.swerve.SwerveController;
-import frc.team88.swerve.motion.state.VelocityState;
-import frc.team88.swerve.motion.state.OdomState;
-
-public class TunnelThread extends Thread {
+public class TunnelClient extends Thread {
     protected Socket socket;
-    private SwerveController m_swerve;
+    private TunnelInterface tunnel_interface;
     private TunnelProtocol protocol;
 
     private InputStream input = null;
@@ -30,21 +23,13 @@ public class TunnelThread extends Thread {
     private byte[] buffer = new byte[buffer_size];
     private int unparsed_index = 0;
     
-    private long last_command_time = 0;
-    private final long ACTIVE_TIME_THRESHOLD = 1_000_000;  // microseconds
-    private VelocityState swerveCommand = new VelocityState(0.0, 0.0, 0.0, false);
-
     private static ReentrantLock write_lock = new ReentrantLock();
 
-    public TunnelThread(SwerveController swerve, Socket clientSocket) {
+    public TunnelClient(TunnelInterface tunnel_interface, Socket clientSocket) {
         this.socket = clientSocket;
-        this.m_swerve = swerve;
+        this.tunnel_interface = tunnel_interface;
 
-        protocol = new TunnelProtocol(new HashMap<String, String>(){
-            private static final long serialVersionUID = 1L; {
-            put("ping", "f");
-            put("cmd", "fff");
-        }});
+        protocol = new TunnelProtocol(tunnel_interface.getCategories());
 
         System.out.println("Opening client");
         try {
@@ -58,29 +43,11 @@ public class TunnelThread extends Thread {
         }
     }
 
-    public void sendOdometry()
-    {
-        OdomState odom = m_swerve.getOdometry();
-        writePacket("odom",
-            odom.getXPosition(), odom.getYPosition(), odom.getTheta(),
-            odom.getXVelocity(), odom.getYVelocity(), odom.getThetaVelocity()
-        );
-    }
-
-    public boolean isCommandActive() {
-        return isOpen() && getTime() - last_command_time < ACTIVE_TIME_THRESHOLD;
-    }
-
-    public VelocityState getCommand() {
-        return swerveCommand;
-    }
-
-    private void writePacket(String category, Object... objects) {
+    public void writePacket(String category, Object... objects) {
         byte[] packet = protocol.makePacket(category, objects);
-        // System.out.println("Writing: " + TunnelUtil.packetToString(packet));
         
         try {
-            TunnelThread.write_lock.lock();
+            TunnelClient.write_lock.lock();
             writeBuffer(packet);
         }
         catch (IOException e) {
@@ -89,7 +56,7 @@ public class TunnelThread extends Thread {
             isOpen = false;
         }
         finally {
-            TunnelThread.write_lock.unlock();
+            TunnelClient.write_lock.unlock();
         }
     }
 
@@ -113,30 +80,6 @@ public class TunnelThread extends Thread {
         }
     }
 
-    private void packetCallback(PacketResult result) {
-        String category = result.getCategory();
-        if (category.equals("cmd")) {
-            swerveCommand = new VelocityState(
-                (double)result.get(0),
-                (double)result.get(1),
-                (double)result.get(2),
-                false
-            );
-            resetCommandTimer();
-        }
-        else if (category.equals("ping")) {
-            writePacket("ping", (double)result.get(0));
-        }
-    }
-
-    private long getTime() {
-        return RobotController.getFPGATime();
-    }
-    
-    private void resetCommandTimer() {
-        last_command_time = getTime();
-    }
-
     public void run()
     {
         if (!Objects.nonNull(input)) {
@@ -149,14 +92,12 @@ public class TunnelThread extends Thread {
                 if (num_chars_read == 0) {
                     continue;
                 }
-                // System.out.println("Read " + charsIn + " characters");
                 if (num_chars_read == -1) {
                     System.out.println("Closing client");
                     socket.close();
                     return;
                 }
-                // System.out.println("Received: " + TunnelUtil.packetToString(buffer, charsIn));
-                // System.out.println("Buffer: " + TunnelUtil.packetToString(buffer));
+                
                 int last_parsed_index = protocol.parseBuffer(Arrays.copyOfRange(buffer, 0, unparsed_index + num_chars_read));
                 if (last_parsed_index > 0)
                 {
@@ -181,7 +122,7 @@ public class TunnelThread extends Thread {
                         ));
                         continue;
                     }
-                    packetCallback(result);
+                    tunnel_interface.packetCallback(this, result);
                 }
                 while (result.getErrorCode() != -1);
 
