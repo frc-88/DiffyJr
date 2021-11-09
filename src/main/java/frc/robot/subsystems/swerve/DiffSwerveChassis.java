@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import frc.team88.tunnel.TunnelServer;
 
 
 public class DiffSwerveChassis {
@@ -101,6 +102,14 @@ public class DiffSwerveChassis {
         angleController.enableContinuousInput(-Math.PI / 2.0, Math.PI / 2.0);
     }
 
+    public void setEnabled(boolean is_enabled)
+    {
+        frontLeft.setEnabled(is_enabled);
+        frontRight.setEnabled(is_enabled);
+        backLeft.setEnabled(is_enabled);
+        backRight.setEnabled(is_enabled);
+    }
+
     public void update() {
         odometry.update(
             getHeading(),
@@ -109,6 +118,10 @@ public class DiffSwerveChassis {
             backLeft.getState(),
             backRight.getState()
         );
+        frontLeft.update();
+        frontRight.update();
+        backLeft.update();
+        backRight.update();
     }
 
 

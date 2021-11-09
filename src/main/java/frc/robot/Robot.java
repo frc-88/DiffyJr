@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
     }
 
     public void disabledInit() {
+        swerve.setEnabled(false);
     }
 
     @Override
@@ -75,6 +76,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         TunnelServer.instance.println("Diffy Jr teleop enabled");
+        swerve.setEnabled(true);
     }
 
     @Override
