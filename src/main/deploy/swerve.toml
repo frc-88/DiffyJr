@@ -38,7 +38,7 @@ motors.hi.can-id = 3
 azimuth-sensor.template = "canified-pwm"
 azimuth-sensor.can-id = 1
 azimuth-sensor.pwm-channel = 1
-azimuth-sensor.offset = 40.165
+azimuth-sensor.offset = -108.635
 wheel-diameter-inches = 3.5
 
 azimuth-controller.kP = 15.0
