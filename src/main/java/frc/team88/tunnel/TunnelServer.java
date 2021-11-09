@@ -63,12 +63,7 @@ public class TunnelServer extends Thread {
 
     // Send message to all clients
     public void println(String message) {
-        for (int index = 0; index < clients.size(); index++)
-        {
-            if (clients.get(index).isAlive() && clients.get(index).isOpen()) {
-                clients.get(index).println(message);
-            }
-        }
+        writePacket("__msg__", message);
     }
 
     @Override

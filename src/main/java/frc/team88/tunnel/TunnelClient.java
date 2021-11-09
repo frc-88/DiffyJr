@@ -48,11 +48,6 @@ public class TunnelClient extends Thread {
         writeBytes(packet);
     }
 
-    public void println(String message) {
-        message += "\n";
-        writeBytes(message.getBytes());
-    }
-
     private void writeBytes(byte[] data) {
         try {
             TunnelClient.write_lock.lock();

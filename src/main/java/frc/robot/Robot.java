@@ -48,17 +48,19 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+        diffy_interface = new DiffyTunnelInterface(this.swerve);
         tunnel = new TunnelServer(diffy_interface, 5800, 15);
         
         this.swerve = new SwerveController("swerve.toml");
         this.swerve.setGyroYaw(0);
         this.swerve.setAzimuthWrapBiasStrategy((SwerveModule module) -> diffyJrAzimuthWrapStrategy(module));
 
-        diffy_interface = new DiffyTunnelInterface(this.swerve);
         tunnel.start();
 
         swerve_table = new SwerveNetworkTable(swerve);
         this.gamepad = new Joystick(GAMEPAD_PORT);
+
+        TunnelServer.instance.println("Diffy Jr is initialized");
     }
 
     public double diffyJrAzimuthWrapStrategy(SwerveModule module) {
@@ -111,6 +113,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         this.swerve.setBrake();
+        TunnelServer.instance.println("Diffy Jr teleop enabled");
     }
 
     @Override
