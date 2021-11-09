@@ -25,7 +25,7 @@ public class TunnelServer extends Thread {
         clients = new ArrayList<TunnelClient>();
         this.port = port;
         this.tunnel_interface = tunnel_interface;
-        data_relay_thread = new TunnelDataRelayThread(tunnel_interface, data_relay_delay_ms);
+        this.data_relay_thread = new TunnelDataRelayThread(tunnel_interface, data_relay_delay_ms);
     }
 
     public boolean anyClientsAlive()
@@ -81,7 +81,7 @@ public class TunnelServer extends Thread {
         System.out.println("Socket is open");
         try
         {
-            data_relay_thread.start();
+            this.data_relay_thread.start();
 
             while (true) {
                 try {
