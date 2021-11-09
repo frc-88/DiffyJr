@@ -45,14 +45,17 @@ public class TunnelClient extends Thread {
 
     public void writePacket(String category, Object... objects) {
         byte[] packet = protocol.makePacket(category, objects);
-        
+        writeBytes(packet);
+    }
+
+    private void writeBytes(byte[] data) {
         try {
             TunnelClient.write_lock.lock();
-            writeBuffer(packet);
+            writeBuffer(data);
         }
         catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Failed while writing packet: " + TunnelUtil.packetToString(packet));
+            System.out.println("Failed while writing data: " + TunnelUtil.packetToString(data));
             isOpen = false;
         }
         finally {

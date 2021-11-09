@@ -13,7 +13,11 @@ import frc.team88.tunnel.TunnelServer;
 import frc.team88.tunnel.TunnelClient;
 
 public class DiffyTunnelInterface implements TunnelInterface {
+<<<<<<< HEAD
     private DiffSwerveChassis swerve;
+=======
+    private SwerveController swerve;
+>>>>>>> ros
     private long last_command_time = 0;
     private TunnelClient last_command_client;
     private final long ACTIVE_TIME_THRESHOLD = 1_000_000; // microseconds
