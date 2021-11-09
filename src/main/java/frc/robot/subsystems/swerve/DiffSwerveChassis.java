@@ -21,8 +21,8 @@ public class DiffSwerveChassis {
     private final SwerveDriveKinematics kinematics;
     private final SwerveDriveOdometry odometry;
 
-    private HolonomicDriveController controller;
-    private ProfiledPIDController angleController;
+    private final HolonomicDriveController controller;
+    private final ProfiledPIDController angleController;
     private double angleSetpoint = 0.0;
 
     private final NavX imu;
@@ -120,6 +120,15 @@ public class DiffSwerveChassis {
         odometry.resetPosition(pose, getHeading());
     }
 
+    public ChassisSpeeds getChassisVelocity() {
+        return kinematics.toChassisSpeeds(
+            frontLeft.getState(),
+            frontRight.getState(),
+            backLeft.getState(),
+            backRight.getState()
+        );
+    }
+
     public double getVelocityX(){
         //Get the X veloctiy of the robot
         return imu.getVelocityX();
@@ -133,15 +142,6 @@ public class DiffSwerveChassis {
     public double getVelocityZ(){
         //Get the Z velocity of the robot
         return imu.getVelocityZ();
-    }
-
-    public ChassisSpeeds getChassisVelocity() {
-        return kinematics.toChassisSpeeds(
-            frontLeft.getState(),
-            frontRight.getState(),
-            backLeft.getState(),
-            backRight.getState()
-        );
     }
 
     // yaw is negative to follow wpi coordinate system.

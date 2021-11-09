@@ -69,8 +69,7 @@ public class Constants {
         public static final double WHEEL_RADIUS = 0.04445; // Meters with compression.
         public static final double TICKS_TO_ROTATIONS = 2048.0;
         public static final double VOLTAGE = 12.0;
-        public static final double FEED_FORWARD = 1.0;
-        // public static final double FEED_FORWARD = VOLTAGE / (FALCON_FREE_SPEED / GEAR_RATIO_WHEEL);
+        public static final double FEED_FORWARD = VOLTAGE / FALCON_FREE_SPEED;
 
         public static final boolean ENABLE_CURRENT_LIMIT = true;
         public static final double CURRENT_LIMIT = 30.0;

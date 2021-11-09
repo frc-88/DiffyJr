@@ -15,9 +15,11 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.LinearSystemLoop;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
+import edu.wpi.first.wpiutil.math.Pair;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.*;
 
@@ -34,6 +36,7 @@ public class DiffSwerveModule {
     private Matrix<N2, N1> input;
 
     private Matrix<N2, N2> diffMatrix;
+    private Matrix<N2, N2> inverseDiffMatrix;
 
     private boolean is_enabled = false;
 
@@ -49,6 +52,7 @@ public class DiffSwerveModule {
             Constants.DifferentialSwerveModule.GEAR_M11, Constants.DifferentialSwerveModule.GEAR_M12,
             Constants.DifferentialSwerveModule.GEAR_M21, Constants.DifferentialSwerveModule.GEAR_M22
         );
+        inverseDiffMatrix = diffMatrix.inv();
 
         swerveControlLoop = initControlLoop();
         input = VecBuilder.fill(0, 0);
@@ -95,8 +99,7 @@ public class DiffSwerveModule {
                 createDifferentialSwerveModule(
                         DCMotor.getFalcon500(2),
                         Constants.DifferentialSwerveModule.INERTIA_STEER,
-                        Constants.DifferentialSwerveModule.INERTIA_WHEEL,
-                        diffMatrix);
+                        Constants.DifferentialSwerveModule.INERTIA_WHEEL);
 
         // Creates a Kalman Filter as our Observer for our module. Works since system is linear.
         KalmanFilter<N3, N2, N3> swerveObserver =
@@ -162,7 +165,7 @@ public class DiffSwerveModule {
      * @param Gw is the Gear Ratio of the wheel.
      * @return LinearSystem of state space model.
      */
-    private static LinearSystem<N3, N2, N3> createDifferentialSwerveModule(DCMotor motor, double J_hi, double J_lo, Matrix<N2, N2> diffMatrix) {
+    private LinearSystem<N3, N2, N3> createDifferentialSwerveModule(DCMotor motor, double J_hi, double J_lo) {
         double K_t = motor.KtNMPerAmp;
         double K_v = motor.KvRadPerSecPerVolt;
         double R = motor.rOhms;
@@ -171,7 +174,6 @@ public class DiffSwerveModule {
         double K_hi = K_t / (R * J_hi);
         double K_lo = K_t / (R * J_lo);
 
-        Matrix<N2, N2> inverseDiffMatrix = diffMatrix.inv();
         Matrix<N2, N2> A_subset_constants = Matrix.mat(Nat.N2(), Nat.N2()).fill(
             C_hi, C_lo,
             C_hi, C_lo
@@ -211,9 +213,10 @@ public class DiffSwerveModule {
         // sets the next reference / setpoint.
         swerveControlLoop.setNextR(reference);
         // updates the kalman filter with new data points.
+        Pair<Double, Double> velocities = getAngularVelocities();
         swerveControlLoop.correct(
                 VecBuilder.fill(
-                        getModuleAngle(), getAzimuthAngularVelocity(), getWheelAngularVelocity()));
+                        getModuleAngle(), velocities.getFirst(), velocities.getSecond()));
         // predict step of kalman filter.
         predict();
         if (is_enabled) {
@@ -226,26 +229,23 @@ public class DiffSwerveModule {
     // use custom predict() function for as absolute encoder azimuth angle and the angular velocity
     // of the module need to be continuous.
     private void predict() {
-        // creates our input of voltage to our motors of u = K(r-x) but need to wrap angle to be
-        // continuous
-        // see wrapAngle().
-        input =
-                swerveControlLoop.clampInput(
-                        swerveControlLoop
-                                .getController()
-                                .getK()
-                                .times(
-                                        wrapAngle(
-                                                swerveControlLoop.getNextR(),
-                                                swerveControlLoop.getXHat(),
-                                                -Math.PI,
-                                                Math.PI))
-                                .plus(
-                                        VecBuilder.fill(
-                                                Constants.DifferentialSwerveModule.FEED_FORWARD
-                                                        * reference.get(2, 0),
-                                                -Constants.DifferentialSwerveModule.FEED_FORWARD
-                                                        * reference.get(2, 0))));
+        // creates our input of voltage to our motors of u = K(r-x)+Kf*r but need to wrap angle to be
+        // continuous see computeErrorAndWrapAngle().
+        
+        Matrix<N2, N1> inputVelocities = getDifferentialInputs(reference.get(2, 0), reference.get(1, 0));
+        Matrix<N2, N1> feedforwardVoltages = inputVelocities.times(Constants.DifferentialSwerveModule.FEED_FORWARD);
+
+        input = swerveControlLoop.clampInput(
+            swerveControlLoop
+                .getController()
+                .getK()
+                .times(
+                    computeErrorAndWrapAngle(
+                        swerveControlLoop.getNextR(),
+                        swerveControlLoop.getXHat(),
+                        -Math.PI,
+                        Math.PI))
+                .plus(feedforwardVoltages));
         swerveControlLoop.getObserver().predict(input, Constants.DifferentialSwerveModule.kDt);
     }
 
@@ -259,7 +259,7 @@ public class DiffSwerveModule {
      * @param minAngle is the minimum angle in our case -PI.
      * @param maxAngle is the maximum angle in our case PI.
      */
-    private Matrix<N3, N1> wrapAngle(
+    private Matrix<N3, N1> computeErrorAndWrapAngle(
             Matrix<N3, N1> reference, Matrix<N3, N1> xHat, double minAngle, double maxAngle) {
         double angleError = reference.get(0, 0) - getModuleAngle();
         double positionError = MathUtil.inputModulus(angleError, minAngle, maxAngle);
@@ -290,14 +290,15 @@ public class DiffSwerveModule {
                 (azimuthSensor.getPosition() % (2.0 * Math.PI)) - azimuthOffset, true);
     }
 
-    public double getWheelAngularVelocity() {
-        // TODO
-        return 0.0;
+    // Get module velocities. Pair order: (wheel angular velocity, azimuth angular velocity)
+    public Pair<Double, Double> getAngularVelocities() {
+        Matrix<N2, N1> outputs = getDifferentialOutputs(getMotorRadiansPerSecond(hiMotor), getMotorRadiansPerSecond(loMotor));
+        return new Pair<Double, Double>(outputs.get(0, 0), outputs.get(1, 0));
     }
 
     // Get module wheel velocity in meters per sec.
     public double getWheelVelocity() {
-        return getWheelAngularVelocity()
+        return getAngularVelocities().getFirst()
                 * Constants.DifferentialSwerveModule.WHEEL_RADIUS;
     }
 
@@ -305,15 +306,23 @@ public class DiffSwerveModule {
         return getPredictedWheelAngularVelocity() * Constants.DifferentialSwerveModule.WHEEL_RADIUS;
     }
 
-    public double getAzimuthAngularVelocity() {
-        // TODO
-        return 0.0;
+    // Converts differential inputs (hi and lo motor rotational velocity)
+    public Matrix<N2, N1> getDifferentialOutputs(double angularVelocityHiMotor, double angularVelocityLoMotor) {
+        return diffMatrix.times(VecBuilder.fill(angularVelocityHiMotor, angularVelocityLoMotor));
+    }
+
+    // Converts differential inputs (hi and lo motor rotational velocity)
+    public Matrix<N2, N1> getDifferentialInputs(double angularVelocityWheel, double angularVelocityAzimuth) {
+        return inverseDiffMatrix.times(VecBuilder.fill(angularVelocityWheel, angularVelocityAzimuth));
     }
 
     public double getMotorRPM(TalonFX motor) {
         return motor.getSelectedSensorVelocity()
                 / Constants.DifferentialSwerveModule.TICKS_TO_ROTATIONS
                 * Constants.DifferentialSwerveModule.FALCON_RATE;
+    }
+    public double getMotorRadiansPerSecond(TalonFX motor) {
+        return Units.rotationsPerMinuteToRadiansPerSecond(getMotorRPM(motor));
     }
 
     public double getMotorVoltage(TalonFX motor) {
