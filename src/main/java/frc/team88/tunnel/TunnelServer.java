@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class TunnelServer extends Thread {
 
@@ -12,12 +13,18 @@ public class TunnelServer extends Thread {
     private ArrayList<TunnelClient> clients;
     private TunnelDataRelayThread data_relay_thread;
 
+    public static TunnelServer instance = null;
+
     public TunnelServer(TunnelInterface tunnel_interface, int port, int data_relay_delay_ms)
     {
+        if (Objects.isNull(instance)) {
+            throw new RuntimeException("Only once instance of TunnelServer allowed");
+        }
+        instance = this;
+
         clients = new ArrayList<TunnelClient>();
         this.port = port;
         this.tunnel_interface = tunnel_interface;
-        this.tunnel_interface.setTunnelServer(this);
         data_relay_thread = new TunnelDataRelayThread(tunnel_interface, data_relay_delay_ms);
     }
 
@@ -50,6 +57,16 @@ public class TunnelServer extends Thread {
         {
             if (clients.get(index).isAlive() && clients.get(index).isOpen()) {
                 clients.get(index).writePacket(category, objects);
+            }
+        }
+    }
+
+    // Send message to all clients
+    public void println(String message) {
+        for (int index = 0; index < clients.size(); index++)
+        {
+            if (clients.get(index).isAlive() && clients.get(index).isOpen()) {
+                clients.get(index).println(message);
             }
         }
     }
