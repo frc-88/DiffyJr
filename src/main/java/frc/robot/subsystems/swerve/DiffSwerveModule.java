@@ -213,7 +213,6 @@ public class DiffSwerveModule {
             0.0, 0.0,
             0.0, 0.0
         );
-        TunnelServer.instance.println("something");
         return new LinearSystem<>(A, B, C, D);
     }
 

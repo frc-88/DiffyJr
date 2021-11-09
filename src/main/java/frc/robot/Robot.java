@@ -43,9 +43,9 @@ public class Robot extends TimedRobot {
         swerve_table = new SwerveNetworkTable(swerve);
         this.gamepad = new Joystick(GAMEPAD_PORT);
 
-        TunnelServer.instance.println("Diffy Jr is initialized");
-        
         this.swerve = new DiffSwerveChassis();
+
+        TunnelServer.instance.println("Diffy Jr is initialized");
     }
 
     @Override
