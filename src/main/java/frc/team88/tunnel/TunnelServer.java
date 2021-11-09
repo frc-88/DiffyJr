@@ -17,7 +17,7 @@ public class TunnelServer extends Thread {
 
     public TunnelServer(TunnelInterface tunnel_interface, int port, int data_relay_delay_ms)
     {
-        if (Objects.isNull(instance)) {
+        if (!Objects.isNull(instance)) {
             throw new RuntimeException("Only once instance of TunnelServer allowed");
         }
         instance = this;

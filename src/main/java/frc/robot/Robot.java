@@ -48,12 +48,13 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+        tunnel = new TunnelServer(diffy_interface, 5800, 15);
+        
         this.swerve = new SwerveController("swerve.toml");
         this.swerve.setGyroYaw(0);
         this.swerve.setAzimuthWrapBiasStrategy((SwerveModule module) -> diffyJrAzimuthWrapStrategy(module));
 
         diffy_interface = new DiffyTunnelInterface(this.swerve);
-        tunnel = new TunnelServer(diffy_interface, 5800, 15);
         tunnel.start();
 
         swerve_table = new SwerveNetworkTable(swerve);
