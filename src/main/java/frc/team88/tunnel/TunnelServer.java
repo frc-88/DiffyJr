@@ -69,7 +69,6 @@ public class TunnelServer extends Thread {
     @Override
     public void run()
     {
-        data_relay_thread.start();
         ServerSocket serverSocket = null;
         Socket socket = null;
 
@@ -82,6 +81,8 @@ public class TunnelServer extends Thread {
         System.out.println("Socket is open");
         try
         {
+            data_relay_thread.start();
+
             while (true) {
                 try {
                     socket = serverSocket.accept();
