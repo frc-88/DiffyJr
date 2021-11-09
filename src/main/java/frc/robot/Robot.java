@@ -37,25 +37,14 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         diffy_interface = new DiffyTunnelInterface(this.swerve);
         tunnel = new TunnelServer(diffy_interface, 5800, 15);
-<<<<<<< HEAD
-=======
         
-        this.swerve = new SwerveController("swerve.toml");
-        this.swerve.setGyroYaw(0);
-        this.swerve.setAzimuthWrapBiasStrategy((SwerveModule module) -> diffyJrAzimuthWrapStrategy(module));
-
->>>>>>> ros
         tunnel.start();
 
         swerve_table = new SwerveNetworkTable(swerve);
         this.gamepad = new Joystick(GAMEPAD_PORT);
-<<<<<<< HEAD
-=======
 
         TunnelServer.instance.println("Diffy Jr is initialized");
-    }
->>>>>>> ros
-
+        
         this.swerve = new DiffSwerveChassis();
     }
 
