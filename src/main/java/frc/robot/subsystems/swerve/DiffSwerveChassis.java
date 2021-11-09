@@ -110,7 +110,8 @@ public class DiffSwerveChassis {
         backRight.setEnabled(is_enabled);
     }
 
-    public void update() {
+    public void periodic() {
+        // Called in main periodic callback in Robot
         odometry.update(
             getHeading(),
             frontLeft.getState(),
@@ -118,6 +119,10 @@ public class DiffSwerveChassis {
             backLeft.getState(),
             backRight.getState()
         );
+    }
+
+    public void controllerPeriodic() {
+        // Called in separate periodic loop with a faster update rate
         frontLeft.update();
         frontRight.update();
         backLeft.update();

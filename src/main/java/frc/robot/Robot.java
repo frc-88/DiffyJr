@@ -45,13 +45,15 @@ public class Robot extends TimedRobot {
         swerve_table = new SwerveNetworkTable(swerve);
         this.gamepad = new Joystick(GAMEPAD_PORT);
 
+        this.addPeriodic(this::controllerPeriodic, 0.005, 0.005);
+
         TunnelServer.instance.println("Diffy Jr is initialized");
     }
 
     @Override
     public void robotPeriodic() {
         // Happens after mode periodic method
-        this.swerve.update();
+        this.swerve.periodic();
         this.swerve_table.update();
     }
 
@@ -77,6 +79,10 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         TunnelServer.instance.println("Diffy Jr teleop enabled");
         swerve.setEnabled(true);
+    }
+
+    public void controllerPeriodic() {
+        this.swerve.controllerPeriodic();
     }
 
     @Override

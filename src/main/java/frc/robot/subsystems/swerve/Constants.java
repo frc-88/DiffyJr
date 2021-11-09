@@ -61,10 +61,10 @@ public class Constants {
         public static final double FALCON_FREE_SPEED =
                 Units.rotationsPerMinuteToRadiansPerSecond(6380);
         public static final int TIMEOUT = 500;
-        public static final double GEAR_M11 = 0.041666666;
-        public static final double GEAR_M12 = -0.041666666;
-        public static final double GEAR_M21 = 0.069444444;
-        public static final double GEAR_M22 = 0.09722222;
+        public static final double GEAR_M11 = 5.0/72.0;
+        public static final double GEAR_M12 = 7.0/72.0;
+        public static final double GEAR_M21 = 1.0/24.0;
+        public static final double GEAR_M22 = -1.0/24.0;
         public static final double FALCON_RATE = 600.0;
         public static final double WHEEL_RADIUS = 0.04445; // Meters with compression.
         public static final double TICKS_TO_ROTATIONS = 2048.0;
