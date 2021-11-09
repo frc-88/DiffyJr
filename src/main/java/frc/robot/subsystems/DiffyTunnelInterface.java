@@ -13,7 +13,6 @@ import frc.team88.tunnel.TunnelServer;
 import frc.team88.tunnel.TunnelClient;
 
 public class DiffyTunnelInterface implements TunnelInterface {
-    private TunnelServer server;
     private DiffSwerveChassis swerve;
     private long last_command_time = 0;
     private TunnelClient last_command_client;
@@ -55,15 +54,10 @@ public class DiffyTunnelInterface implements TunnelInterface {
     public void update() {
         Pose2d pose = this.swerve.getOdometryPose();
         ChassisSpeeds velocity = this.swerve.getChassisVelocity();
-        this.server.writePacket("odom",
+        TunnelServer.instance.writePacket("odom",
             pose.getX(), pose.getY(), pose.getRotation().getRadians(),
             velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, velocity.omegaRadiansPerSecond
         );
-    }
-
-    @Override
-    public void setTunnelServer(TunnelServer server) {
-        this.server = server;
     }
 
     private long getTime() {

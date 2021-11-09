@@ -22,6 +22,7 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Pair;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.*;
+import frc.team88.tunnel.TunnelServer;
 
 public class DiffSwerveModule {
     private final TalonFX hiMotor;
@@ -174,11 +175,11 @@ public class DiffSwerveModule {
         double K_hi = K_t / (R * J_hi);
         double K_lo = K_t / (R * J_lo);
 
-        Matrix<N2, N2> A_subset_constants = Matrix.mat(Nat.N2(), Nat.N2()).fill(
-            C_hi, C_lo,
-            C_hi, C_lo
-        );
-        Matrix<N2, N2> A_subset = A_subset_constants.times(inverseDiffMatrix);
+        // Matrix<N2, N2> A_subset_constants = Matrix.mat(Nat.N2(), Nat.N2()).fill(
+        //     C_hi, C_lo,
+        //     C_hi, C_lo
+        // );
+        // Matrix<N2, N2> A_subset = A_subset_constants.times(inverseDiffMatrix);
         
         Matrix<N2, N2> B_subset_constants = Matrix.mat(Nat.N2(), Nat.N2()).fill(
             K_hi, K_lo,
@@ -186,11 +187,17 @@ public class DiffSwerveModule {
         );
         Matrix<N2, N2> B_subset = B_subset_constants.times(diffMatrix);
 
+        // var A = Matrix.mat(Nat.N3(), Nat.N3()).fill(
+        //     0.0, 1.0, 0.0,
+        //     0.0, A_subset.get(0, 0), A_subset.get(0, 1),
+        //     0.0, A_subset.get(1, 0), A_subset.get(1, 1)
+        // );
         var A = Matrix.mat(Nat.N3(), Nat.N3()).fill(
             0.0, 1.0, 0.0,
-            0.0, A_subset.get(0, 0), A_subset.get(0, 1),
-            0.0, A_subset.get(1, 0), A_subset.get(1, 1)
+            0.0, C_hi, C_lo,
+            0.0, C_hi, C_lo
         );
+        
         var B = Matrix.mat(Nat.N3(), Nat.N2()).fill(
             0.0, 0.0,
             B_subset.get(0, 0), B_subset.get(0, 1),
@@ -206,6 +213,7 @@ public class DiffSwerveModule {
             0.0, 0.0,
             0.0, 0.0
         );
+        TunnelServer.instance.println("something");
         return new LinearSystem<>(A, B, C, D);
     }
 

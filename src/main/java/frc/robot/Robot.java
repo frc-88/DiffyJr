@@ -35,14 +35,14 @@ public class Robot extends TimedRobot {
     
     @Override
     public void robotInit() {
-        this.swerve = new DiffSwerveChassis();
-
         diffy_interface = new DiffyTunnelInterface(this.swerve);
         tunnel = new TunnelServer(diffy_interface, 5800, 15);
         tunnel.start();
 
         swerve_table = new SwerveNetworkTable(swerve);
         this.gamepad = new Joystick(GAMEPAD_PORT);
+
+        this.swerve = new DiffSwerveChassis();
     }
 
     @Override
