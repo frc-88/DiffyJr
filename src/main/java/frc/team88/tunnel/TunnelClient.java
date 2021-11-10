@@ -80,6 +80,7 @@ public class TunnelClient extends Thread {
         catch (SocketException e) {
             e.printStackTrace();
             isOpen = false;
+            System.out.println("Failed while writing buffer: " + TunnelUtil.packetToString(buffer));
         }
     }
 

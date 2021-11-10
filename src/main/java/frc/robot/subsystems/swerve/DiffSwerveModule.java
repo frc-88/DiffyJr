@@ -147,7 +147,7 @@ public class DiffSwerveModule {
                         swerveModuleModel,
                         swerveController,
                         swerveObserver,
-                        12.0,
+                        Constants.DifferentialSwerveModule.VOLTAGE,
                         Constants.DifferentialSwerveModule.kDt);
 
         // Initializes the vectors and matrices.
@@ -211,6 +211,9 @@ public class DiffSwerveModule {
         swerveControlLoop.setNextR(reference);
         // updates the kalman filter with new data points.
         Pair<Double, Double> velocities = getAngularVelocities();
+        // System.out.println(String.format("velocities: %f, %f", velocities.getFirst(), velocities.getSecond()));
+        System.out.println(String.format("voltage: %f, %f", getHiNextVoltage(), getLoNextVoltage()));
+        
         swerveControlLoop.correct(
                 VecBuilder.fill(
                         getModuleAngle(), velocities.getFirst(), velocities.getSecond()));
