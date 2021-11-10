@@ -91,6 +91,7 @@ public class Helpers {
      * @return changed angle.
      */
     public static double boundHalfAngle(double angle, boolean radians) {
+        angle %= 2.0 * Math.PI;
         angle = radians ? angle : Units.degreesToRadians(angle);
         while (angle >= Math.PI) {
             angle -= 2.0 * Math.PI;

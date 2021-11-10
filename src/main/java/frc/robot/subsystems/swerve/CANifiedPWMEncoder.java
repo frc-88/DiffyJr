@@ -13,13 +13,22 @@ public class CANifiedPWMEncoder {
   // The channel that the encoder is plugged into
   private PWMChannel channel;
 
+  // Conversion from ticks to number of rotations
+  private double ratio = 1.0;
+
+  // offset between encoder zero and robot zero (radians)
+  private double offset = 0.0;
+
   /**
    * Constructor.
    *
    * @param canifier The CANifier that the encoder is plugged into
    * @param channel The channel that the encoder is plugged into
    */
-  public CANifiedPWMEncoder(int canifierID, int pwmChannel) {
+  public CANifiedPWMEncoder(int canifierID, int pwmChannel, double offset, double ratio) {
+    this.ratio = ratio;
+    this.offset = offset;
+
     PWMChannel channel;
     switch (pwmChannel) {
       case 0:
@@ -53,10 +62,10 @@ public class CANifiedPWMEncoder {
   public double getPosition() {
     double[] dutyAndPeriod = new double[2];
     this.canifier.getPWMInput(channel, dutyAndPeriod);
-    if (dutyAndPeriod[1] == 0.) {
+    if (dutyAndPeriod[1] == 0.0) {
       // Sensor is unplugged
-      return 0.0;
+      return Double.NaN;
     }
-    return 2.0 * Math.PI * dutyAndPeriod[0] / dutyAndPeriod[1];
+    return 2.0 * Math.PI * this.ratio * dutyAndPeriod[0] / dutyAndPeriod[1] - this.offset;
   }
 }

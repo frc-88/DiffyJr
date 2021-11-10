@@ -29,7 +29,6 @@ public class DiffSwerveModule {
     private final TalonFX loMotor;
 
     private final CANifiedPWMEncoder azimuthSensor;
-    private final double azimuthOffset;  // angle in radians
 
     private final LinearSystemLoop<N3, N2, N3> swerveControlLoop;
 
@@ -43,11 +42,16 @@ public class DiffSwerveModule {
 
     private Translation2d moduleLocation;
 
-    public DiffSwerveModule(Translation2d moduleLocation, int loCanID, int hiCanID, int azimuthCanifierID, int azimuthPwmChannel, double azimuthOffsetRadians) {
+    public DiffSwerveModule(
+            Translation2d moduleLocation,
+            int loCanID, int hiCanID, int azimuthCanifierID, int azimuthPwmChannel,
+            double azimuthOffsetRadians) {
         loMotor = initFalconMotor(loCanID);
         hiMotor = initFalconMotor(hiCanID);
-        azimuthSensor = new CANifiedPWMEncoder(azimuthCanifierID, azimuthPwmChannel);
-        azimuthOffset = azimuthOffsetRadians;
+        azimuthSensor = new CANifiedPWMEncoder(
+            azimuthCanifierID, azimuthPwmChannel, azimuthOffsetRadians,
+            Constants.DifferentialSwerveModule.AZIMUTH_TICKS_TO_ROTATIONS
+        );
 
         diffMatrix = Matrix.mat(Nat.N2(), Nat.N2()).fill(
             Constants.DifferentialSwerveModule.GEAR_M11, Constants.DifferentialSwerveModule.GEAR_M12,
@@ -288,8 +292,7 @@ public class DiffSwerveModule {
 
 
     public double getModuleAngle() {
-        return Helpers.boundHalfAngle(
-                (azimuthSensor.getPosition() % (2.0 * Math.PI)) - azimuthOffset, true);
+        return Helpers.boundHalfAngle(azimuthSensor.getPosition(), true);
     }
 
     // Get module velocities. Pair order: (wheel angular velocity, azimuth angular velocity)
@@ -320,7 +323,7 @@ public class DiffSwerveModule {
 
     public double getMotorRPM(TalonFX motor) {
         return motor.getSelectedSensorVelocity()
-                / Constants.DifferentialSwerveModule.TICKS_TO_ROTATIONS
+                * Constants.DifferentialSwerveModule.FALCON_TICKS_TO_ROTATIONS
                 * Constants.DifferentialSwerveModule.FALCON_RATE;
     }
     public double getMotorRadiansPerSecond(TalonFX motor) {

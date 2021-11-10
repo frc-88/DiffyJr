@@ -1,11 +1,8 @@
 package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.util.Units;
-import java.util.Arrays;
-import java.util.List;
 
 public class Constants {
 
@@ -18,30 +15,21 @@ public class Constants {
         public static Pose2d robotPose;
         public static final double WIDTH = 0.154305;
         public static final double LENGTH = 0.154305;
-        public static final double FRONT_LEFT_ENCODER_OFFSET = Math.toRadians(0.0);
-        public static final double FRONT_RIGHT_ENCODER_OFFSET = Math.toRadians(0.0);
-        public static final double BACK_RIGHT_ENCODER_OFFSET = Math.toRadians(0.0);
-        public static final double BACK_LEFT_ENCODER_OFFSET = Math.toRadians(0.0);
+        public static final double FRONT_LEFT_ENCODER_OFFSET = Math.toRadians(136.93);
+        public static final double BACK_LEFT_ENCODER_OFFSET = Math.toRadians(-108.635);
+        public static final double BACK_RIGHT_ENCODER_OFFSET = Math.toRadians(-46.68);
+        public static final double FRONT_RIGHT_ENCODER_OFFSET = Math.toRadians(-141.85);
         public static final Translation2d FRONT_LEFT_POSITION = new Translation2d(WIDTH / 2.0, LENGTH / 2.0);
-        public static final Translation2d FRONT_RIGHT_POSITION = new Translation2d(WIDTH / 2.0, -LENGTH / 2.0);
         public static final Translation2d BACK_LEFT_POSITION = new Translation2d(-WIDTH / 2.0, LENGTH / 2.0);
         public static final Translation2d BACK_RIGHT_POSITION = new Translation2d(-WIDTH / 2.0, -LENGTH / 2.0);
+        public static final Translation2d FRONT_RIGHT_POSITION = new Translation2d(WIDTH / 2.0, -LENGTH / 2.0);
 
         public static final double DEADBAND = 0.2;
         public static final double RACE_WHEEL_DEADBAND = 0.1;
-        public static final double WHEEL_SPEED = 2; //Race Wheel turning speed
-        public static double MAX_MPS = 4.5; //Speed of the swerves
 
-        public static double SENSITIVITY_VX = 0.9;
-        public static double SENSITIVITY_VY = 0.9;
-
-        public static final double VISION_kP = 0.2;
-        public static final double VISION_kI = 0.0;
-        public static final double VISION_kD = 0.005;
-
-        //        public static final double MAX_MPS = 1.0;
-        public static final double MAX_ANG_VEL = Math.PI * 2.0;
-        public static final double MAX_MPSS = 0.5; // accel
+        public static final double MAX_CHASSIS_SPEED = 4.5;  // Maximum chassis speed (m/s)
+        public static final double MAX_CHASSIS_ANG_VEL = Math.toRadians(90.0);  // Maximum chassis rotational velocity (rad/s)
+        public static final double MAX_CHASSIS_LINEAR_ACCEL = 0.5; // Maximum chassis linear acceleration (m/s^2)
 
         public static final double ANGLE_kP = 3.5;
         public static final double ANGLE_kI = 0.0;
@@ -67,7 +55,8 @@ public class Constants {
         public static final double GEAR_M22 = -1.0/24.0;
         public static final double FALCON_RATE = 600.0;
         public static final double WHEEL_RADIUS = 0.04445; // Meters with compression.
-        public static final double TICKS_TO_ROTATIONS = 2048.0;
+        public static final double FALCON_TICKS_TO_ROTATIONS = 1.0 / 2048.0;
+        public static final double AZIMUTH_TICKS_TO_ROTATIONS = 1.0 / 360.0;
         public static final double VOLTAGE = 12.0;
         public static final double FEED_FORWARD = VOLTAGE / FALCON_FREE_SPEED;
 
@@ -95,79 +84,5 @@ public class Constants {
         public static final double SENSOR_AZIMUTH_ANG_VELOCITY_NOISE = 0.1; // radians per sec
         public static final double SENSOR_WHEEL_ANG_VELOCITY_NOISE = 0.1; // radians per sec
         public static final double CONTROL_EFFORT = VOLTAGE;
-    }
-
-    public static class Spindexer {
-
-        public static boolean SPINDEXER_INVERTED = false;
-        public static boolean FEEDER_INVERTED = false;
-        public static final double SPINDEXER_IDLE_SPEED = -0.25;
-        public static final double SHIMMY = 0.25;
-        public static final double FEEDER_IDLE_SPEED = -0.25;
-        public static final double FEEDER_SHIMMY = 0.25;
-        public static final double SPINDEXER_SPEED = 0.75; // was 0.75 but I'm insane sooo...
-        public static final double FEEDER_SPEED = 1.0;
-    }
-
-    public static class Field {
-        /** Y ^ | | o - - -> X */
-        public static final double FULL_FIELD_X = 16.0;
-
-        public static final double HALF_FIELD_X = FULL_FIELD_X / 2.0;
-        public static final double FULL_FIELD_Y = 8.21055;
-        public static final double TARGET_LINE_Y = 2.404364;
-        public static final double START_LINE_X = FULL_FIELD_X - 3.048;
-        public static final double MID_TRENCH_Y = TARGET_LINE_Y - Units.inchesToMeters(66.91);
-
-        public static final Pose2d TARGET_POSITION =
-                new Pose2d(FULL_FIELD_X, TARGET_LINE_Y, new Rotation2d(0));
-        public static final Pose2d EIGHT_BALL_TRENCH_STARTING_POSITION =
-                new Pose2d(12.8, 5.8, new Rotation2d(0));
-    }
-
-    public static class Maverick{
-        public static short numberOfWaypoints = 4; 
-        public static double[] waypointsX = {12.10, 0.0, 0.0, 0.0};
-        public static double[] waypointsY = {3.67, 0.0, 0.0, 0.0};
-        public static double[] rotations = {2.0, 0.0, 0.0, 0.0};
-        public static double[] tolerences = {0.0, 0.0, 0.0, 0.0};
-        public static double[] speeds = {3.5, 3.5, 3.5, 3.5, 3.5};
-        public static boolean[] afterburner = {false, false, false, false};
-    }
-
-    public static class AutoPath {
-        public static class MoveAndGo {
-            //            public static final List<Pose2d> waypoints =
-            //                    Arrays.asList(
-            //                            new Pose2d()
-            //                    )
-        }
-
-        public static class EightBallAuto {
-            public static final List<Pose2d> waypoints =
-                    Arrays.asList(
-                            new Pose2d(13, 2.34, Rotation2d.fromDegrees(180)),
-                            new Pose2d(12, 2.34, Rotation2d.fromDegrees(180)));
-        }
-
-        public static class StealBallAuto {
-            public static final List<Pose2d> stealInitial =
-                    Arrays.asList(
-                            new Pose2d(12.8, 5.8, Rotation2d.fromDegrees(130)),
-                            new Pose2d(9.95, 7.5, Rotation2d.fromDegrees(180)));
-            public static final List<Pose2d> stealPartTwo =
-                    Arrays.asList(
-                            new Pose2d(9.95, 7.5, Rotation2d.fromDegrees(-70)),
-                            new Pose2d(10.5, 4.07, Rotation2d.fromDegrees(-100)));
-            public static final List<Pose2d> stealPartThree =
-                    Arrays.asList(
-                            new Pose2d(10.5, 4.07, Rotation2d.fromDegrees(-100)),
-                            new Pose2d(9.08, 3.4, Rotation2d.fromDegrees(-100)));
-            public static final List<Pose2d> stealEnd =
-                    Arrays.asList(
-                            new Pose2d(8.9, 3.6, Rotation2d.fromDegrees(45)),
-                            new Pose2d(11.2, 4.16, Rotation2d.fromDegrees(-10)),
-                            new Pose2d(12.5, 3.15, Rotation2d.fromDegrees(-10)));
-        }
     }
 }
