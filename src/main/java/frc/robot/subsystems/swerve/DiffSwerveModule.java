@@ -22,7 +22,7 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Pair;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.*;
-import frc.team88.tunnel.TunnelServer;
+
 
 public class DiffSwerveModule {
     private final TalonFX hiMotor;
@@ -213,6 +213,7 @@ public class DiffSwerveModule {
         Pair<Double, Double> velocities = getAngularVelocities();
         // System.out.println(String.format("velocities: %f, %f", velocities.getFirst(), velocities.getSecond()));
         System.out.println(String.format("voltage: %f, %f", getHiNextVoltage(), getLoNextVoltage()));
+        System.out.println("Azimuth sensor: " + getModuleAngle());
         
         swerveControlLoop.correct(
                 VecBuilder.fill(
@@ -234,6 +235,7 @@ public class DiffSwerveModule {
         
         Matrix<N2, N1> inputVelocities = getDifferentialInputs(reference.get(2, 0), reference.get(1, 0));
         Matrix<N2, N1> feedforwardVoltages = inputVelocities.times(Constants.DifferentialSwerveModule.FEED_FORWARD);
+        System.out.println("feedforwardVoltages: " + feedforwardVoltages);
 
         input = swerveControlLoop.clampInput(
             swerveControlLoop
@@ -417,5 +419,4 @@ public class DiffSwerveModule {
         // }
         setModuleState(SwerveModuleState.optimize(state, new Rotation2d(getModuleAngle())));
     }
-
 }

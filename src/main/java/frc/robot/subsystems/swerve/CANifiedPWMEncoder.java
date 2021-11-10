@@ -1,7 +1,5 @@
 package frc.robot.subsystems.swerve;
 
-import javax.management.RuntimeErrorException;
-
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.PWMChannel;
 import com.ctre.phoenix.CANifierStatusFrame;
@@ -57,7 +55,7 @@ public class CANifiedPWMEncoder {
     this.canifier.getPWMInput(channel, dutyAndPeriod);
     if (dutyAndPeriod[1] == 0.) {
       // Sensor is unplugged
-      return 0;
+      return 0.0;
     }
     return 2.0 * Math.PI * dutyAndPeriod[0] / dutyAndPeriod[1];
   }
