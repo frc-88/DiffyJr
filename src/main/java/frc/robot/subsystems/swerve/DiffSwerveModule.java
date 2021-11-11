@@ -216,7 +216,7 @@ public class DiffSwerveModule {
         // updates the kalman filter with new data points.
         Pair<Double, Double> velocities = getAngularVelocities();
         // System.out.println(String.format("velocities: %f, %f", velocities.getFirst(), velocities.getSecond()));
-        // System.out.println(String.format("voltage: %f, %f", getHiNextVoltage(), getLoNextVoltage()));
+        // System.out.println(String.format("voltage [%s]: %f, %f", moduleLocation, getHiNextVoltage(), getLoNextVoltage()));
         // System.out.println(String.format("Azimuth sensor [%s]: %f", moduleLocation, getModuleAngle()));
         
         swerveControlLoop.correct(
@@ -237,7 +237,7 @@ public class DiffSwerveModule {
         // creates our input of voltage to our motors of u = K(r-x)+Kf*r but need to wrap angle to be
         // continuous see computeErrorAndWrapAngle().
         
-        Matrix<N2, N1> inputVelocities = getDifferentialInputs(reference.get(2, 0), reference.get(1, 0));
+        Matrix<N2, N1> inputVelocities = getDifferentialInputs(reference.get(1, 0), reference.get(2, 0));
         Matrix<N2, N1> feedforwardVoltages = inputVelocities.times(Constants.DifferentialSwerveModule.FEED_FORWARD);
         // System.out.println("feedforwardVoltages: " + feedforwardVoltages);
 
@@ -311,12 +311,12 @@ public class DiffSwerveModule {
         return getPredictedWheelAngularVelocity() * Constants.DifferentialSwerveModule.WHEEL_RADIUS;
     }
 
-    // Converts differential inputs (hi and lo motor rotational velocity)
+    // Converts differential inputs (hi and lo motor rotational velocity -> wheel angular velocity, azimuth angular velocity)
     public Matrix<N2, N1> getDifferentialOutputs(double angularVelocityHiMotor, double angularVelocityLoMotor) {
         return diffMatrix.times(VecBuilder.fill(angularVelocityHiMotor, angularVelocityLoMotor));
     }
 
-    // Converts differential inputs (hi and lo motor rotational velocity)
+    // Converts differential inputs (wheel angular velocity, azimuth angular velocity -> hi and lo motor rotational velocity)
     public Matrix<N2, N1> getDifferentialInputs(double angularVelocityWheel, double angularVelocityAzimuth) {
         return inverseDiffMatrix.times(VecBuilder.fill(angularVelocityWheel, angularVelocityAzimuth));
     }

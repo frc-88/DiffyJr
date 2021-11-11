@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.subsystems.DiffyTunnelInterface;
 import frc.robot.subsystems.SwerveNetworkTable;
 import frc.team88.tunnel.TunnelServer;
+import frc.robot.subsystems.swerve.Constants;
 import frc.robot.subsystems.swerve.DiffSwerveChassis;
 
 /**
@@ -45,7 +46,7 @@ public class Robot extends TimedRobot {
         swerve_table = new SwerveNetworkTable(swerve);
         this.gamepad = new Joystick(GAMEPAD_PORT);
 
-        this.addPeriodic(this::controllerPeriodic, 0.005, 0.005);
+        this.addPeriodic(this::controllerPeriodic, Constants.DifferentialSwerveModule.kDt, 0.0025);
 
         TunnelServer.instance.println("Diffy Jr is initialized");
     }
