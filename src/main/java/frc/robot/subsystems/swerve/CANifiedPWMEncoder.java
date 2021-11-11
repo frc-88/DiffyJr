@@ -66,6 +66,6 @@ public class CANifiedPWMEncoder {
       // Sensor is unplugged
       return Double.NaN;
     }
-    return 2.0 * Math.PI * this.ratio * dutyAndPeriod[0] / dutyAndPeriod[1] - this.offset;
+    return this.ratio * dutyAndPeriod[0] / dutyAndPeriod[1] - this.offset;
   }
 }

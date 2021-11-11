@@ -56,7 +56,7 @@ public class Constants {
         public static final double FALCON_RATE = 600.0;
         public static final double WHEEL_RADIUS = 0.04445; // Meters with compression.
         public static final double FALCON_TICKS_TO_ROTATIONS = 1.0 / 2048.0;
-        public static final double AZIMUTH_TICKS_TO_ROTATIONS = 1.0 / 360.0;
+        public static final double AZIMUTH_ROTATIONS_TO_RADIANS = 2.0 * Math.PI;
         public static final double VOLTAGE = 12.0;
         public static final double FEED_FORWARD = VOLTAGE / FALCON_FREE_SPEED;
 

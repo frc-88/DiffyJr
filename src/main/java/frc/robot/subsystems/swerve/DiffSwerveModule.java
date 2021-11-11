@@ -50,7 +50,7 @@ public class DiffSwerveModule {
         hiMotor = initFalconMotor(hiCanID);
         azimuthSensor = new CANifiedPWMEncoder(
             azimuthCanifierID, azimuthPwmChannel, azimuthOffsetRadians,
-            Constants.DifferentialSwerveModule.AZIMUTH_TICKS_TO_ROTATIONS
+            Constants.DifferentialSwerveModule.AZIMUTH_ROTATIONS_TO_RADIANS
         );
 
         diffMatrix = Matrix.mat(Nat.N2(), Nat.N2()).fill(
@@ -216,8 +216,8 @@ public class DiffSwerveModule {
         // updates the kalman filter with new data points.
         Pair<Double, Double> velocities = getAngularVelocities();
         // System.out.println(String.format("velocities: %f, %f", velocities.getFirst(), velocities.getSecond()));
-        System.out.println(String.format("voltage: %f, %f", getHiNextVoltage(), getLoNextVoltage()));
-        System.out.println("Azimuth sensor: " + getModuleAngle());
+        // System.out.println(String.format("voltage: %f, %f", getHiNextVoltage(), getLoNextVoltage()));
+        // System.out.println(String.format("Azimuth sensor [%s]: %f", moduleLocation, getModuleAngle()));
         
         swerveControlLoop.correct(
                 VecBuilder.fill(
@@ -239,7 +239,7 @@ public class DiffSwerveModule {
         
         Matrix<N2, N1> inputVelocities = getDifferentialInputs(reference.get(2, 0), reference.get(1, 0));
         Matrix<N2, N1> feedforwardVoltages = inputVelocities.times(Constants.DifferentialSwerveModule.FEED_FORWARD);
-        System.out.println("feedforwardVoltages: " + feedforwardVoltages);
+        // System.out.println("feedforwardVoltages: " + feedforwardVoltages);
 
         input = swerveControlLoop.clampInput(
             swerveControlLoop
