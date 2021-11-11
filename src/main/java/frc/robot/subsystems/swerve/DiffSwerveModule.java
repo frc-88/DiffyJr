@@ -117,17 +117,17 @@ public class DiffSwerveModule {
                                         Constants.DifferentialSwerveModule
                                                 .MODEL_AZIMUTH_ANGLE_NOISE,
                                         Constants.DifferentialSwerveModule
-                                                .MODEL_AZIMUTH_ANG_VELOCITY_NOISE,
+                                                .MODEL_WHEEL_ANG_VELOCITY_NOISE,
                                         Constants.DifferentialSwerveModule
-                                                .MODEL_WHEEL_ANG_VELOCITY_NOISE),
+                                                .MODEL_AZIMUTH_ANG_VELOCITY_NOISE),
                         Matrix.mat(Nat.N3(), Nat.N1())
                                 .fill(
                                         Constants.DifferentialSwerveModule
                                                 .SENSOR_AZIMUTH_ANGLE_NOISE,
                                         Constants.DifferentialSwerveModule
-                                                .SENSOR_AZIMUTH_ANG_VELOCITY_NOISE,
+                                                .SENSOR_WHEEL_ANG_VELOCITY_NOISE,
                                         Constants.DifferentialSwerveModule
-                                                .SENSOR_WHEEL_ANG_VELOCITY_NOISE),
+                                                .SENSOR_AZIMUTH_ANG_VELOCITY_NOISE),
                         Constants.DifferentialSwerveModule.kDt);
         // Creates an LQR controller for our Swerve Module.
         LinearQuadraticRegulator<N3, N2, N3> swerveController =
@@ -136,8 +136,8 @@ public class DiffSwerveModule {
                         // Q Vector/Matrix Maximum error tolerance
                         VecBuilder.fill(
                                 Constants.DifferentialSwerveModule.Q_AZIMUTH,
-                                Constants.DifferentialSwerveModule.Q_AZIMUTH_ANG_VELOCITY,
-                                Constants.DifferentialSwerveModule.Q_WHEEL_ANG_VELOCITY),
+                                Constants.DifferentialSwerveModule.Q_WHEEL_ANG_VELOCITY,
+                                Constants.DifferentialSwerveModule.Q_AZIMUTH_ANG_VELOCITY),
                         // R Vector/Matrix Maximum control effort.
                         VecBuilder.fill(
                                 Constants.DifferentialSwerveModule.CONTROL_EFFORT,
