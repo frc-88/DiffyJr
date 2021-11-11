@@ -201,12 +201,6 @@ public class DiffSwerveModule {
             0.0, 0.0
         );
         
-        System.out.println(A);
-        System.out.println(B);
-        System.out.println(C);
-        System.out.println(D);
-        System.out.println(diffMatrix);
-        System.out.println(inverseDiffMatrix);
         return new LinearSystem<>(A, B, C, D);
     }
 
@@ -321,13 +315,10 @@ public class DiffSwerveModule {
         return inverseDiffMatrix.times(VecBuilder.fill(angularVelocityWheel, angularVelocityAzimuth));
     }
 
-    public double getMotorRPM(TalonFX motor) {
+    public double getMotorRadiansPerSecond(TalonFX motor) {
         return motor.getSelectedSensorVelocity()
                 * Constants.DifferentialSwerveModule.FALCON_TICKS_TO_ROTATIONS
-                * Constants.DifferentialSwerveModule.FALCON_RATE;
-    }
-    public double getMotorRadiansPerSecond(TalonFX motor) {
-        return Units.rotationsPerMinuteToRadiansPerSecond(getMotorRPM(motor));
+                * Constants.DifferentialSwerveModule.FALCON_MAX_SPEED_RPS;
     }
 
     public double getMotorVoltage(TalonFX motor) {

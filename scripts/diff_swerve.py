@@ -23,12 +23,14 @@ class Constants:
         [5.0/72.0, 7.0/72.0],
         [1.0/24.0, -1.0/24.0]
     ])
-    Q_AZIMUTH_ANG_VELOCITY = 0.8  # radians per sec
-    Q_WHEEL_ANG_VELOCITY = 5.0  # radians per sec
     Q_AZIMUTH = 1.5  # radians
+    Q_WHEEL_ANG_VELOCITY = 5.0  # radians per sec
+    Q_AZIMUTH_ANG_VELOCITY = 0.8  # radians per sec
+
     MODEL_AZIMUTH_ANGLE_NOISE = 0.1  # radians
     MODEL_WHEEL_ANG_VELOCITY_NOISE = 5.0  # radians per sec
     MODEL_AZIMUTH_ANG_VELOCITY_NOISE = 5.0  # radians per sec
+
     SENSOR_AZIMUTH_ANGLE_NOISE = 0.01  # radians
     SENSOR_WHEEL_ANG_VELOCITY_NOISE = 0.1  # radians per sec
     SENSOR_AZIMUTH_ANG_VELOCITY_NOISE = 0.1  # radians per sec

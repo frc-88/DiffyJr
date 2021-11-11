@@ -173,13 +173,17 @@ public class TunnelProtocol {
                 // System.out.println(String.format("Buffer length exceeded while searching for length stop. %d > %d", index, buffer.length));
                 continue;
             }
+            if (length > MAX_PACKET_LEN) {
+                // System.out.println(String.format("Packet length exceeds max allowable packet size (%d > %d). Skipping", length, MAX_PACKET_LEN));
+                continue;
+            }
             if ((char)buffer[index] != PACKET_STOP) {
                 // System.out.println("Buffer does not end with PACKET_STOP");
                 continue;
             }
-            index++;
-            last_packet_index = index;
-            byte[] packet = Arrays.copyOfRange(buffer, packet_start, index);
+            // do not modify index from this point onward as the for loop increments index
+            last_packet_index = index + 1;
+            byte[] packet = Arrays.copyOfRange(buffer, packet_start, index + 1);
             // System.out.println("Found a packet: " + TunnelUtil.packetToString(packet));
             PacketResult result = parsePacket(packet);
             resultQueue.add(result);
@@ -252,7 +256,6 @@ public class TunnelProtocol {
 
         if (recv_packet_num != this.read_packet_num) {
             System.out.println(String.format("Received packet num doesn't match local count. recv %d != local %d", recv_packet_num, this.read_packet_num));
-            read_packet_num++;
             this.read_packet_num = recv_packet_num;
             result.setErrorCode(PACKET_COUNT_NOT_SYNCED_ERROR);
         }

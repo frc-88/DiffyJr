@@ -47,37 +47,45 @@ public class Constants {
         public static final double kDt = 0.005;
 
         public static final double FALCON_FREE_SPEED =
-                Units.rotationsPerMinuteToRadiansPerSecond(6380);
-        public static final int TIMEOUT = 500;
+                Units.rotationsPerMinuteToRadiansPerSecond(6380.0);  // Radians per second
+        public static final int TIMEOUT = 500;  // CAN sensor timeout
+        
+        // Differential swerve matrix constants. Matrix shape:
+        // | M11   M12 |
+        // | M21   M22 |
         public static final double GEAR_M11 = 5.0/72.0;
         public static final double GEAR_M12 = 7.0/72.0;
         public static final double GEAR_M21 = 1.0/24.0;
         public static final double GEAR_M22 = -1.0/24.0;
-        public static final double FALCON_RATE = 600.0;
-        public static final double WHEEL_RADIUS = 0.04445; // Meters with compression.
-        public static final double FALCON_TICKS_TO_ROTATIONS = 1.0 / 2048.0;
-        public static final double AZIMUTH_ROTATIONS_TO_RADIANS = 2.0 * Math.PI;
-        public static final double VOLTAGE = 12.0;
+
+        public static final double FALCON_MAX_SPEED_RPS = Units.rotationsPerMinuteToRadiansPerSecond(600.0);  // radians per second
+        public static final double WHEEL_RADIUS = 0.04445; // Meters with wheel compression.
+        public static final double FALCON_TICKS_TO_ROTATIONS = 1.0 / 2048.0;  // rotations per tick
+        public static final double AZIMUTH_ROTATIONS_TO_RADIANS = 2.0 * Math.PI;  // radians per rotation of azimuth sensor
+        public static final double VOLTAGE = 12.0;  // volts
         public static final double FEED_FORWARD = VOLTAGE / FALCON_FREE_SPEED;
 
         public static final boolean ENABLE_CURRENT_LIMIT = true;
-        public static final double CURRENT_LIMIT = 30.0;
+        public static final double CURRENT_LIMIT = 30.0;  // amps
         public static final double CURRENT_THRESHOLD = 30.0;
         public static final double CURRENT_TRIGGER_TIME = 0.0;
 
         // Create Parameters for DiffSwerve State Space
-        public static final double INERTIA_WHEEL = 0.005;
-        public static final double INERTIA_STEER = 0.004;
+        public static final double INERTIA_WHEEL = 0.005;  // kg * m^2
+        public static final double INERTIA_STEER = 0.004;  // kg * m^2
+        
         // A weight for how aggressive each state should be ie. 0.08 radians will try to control the
         // angle more aggressively than the wheel angular velocity.
-        public static final double Q_AZIMUTH_ANG_VELOCITY = 1.1; // radians per sec
-        public static final double Q_AZIMUTH = 0.08; // radians
-        public static final double Q_WHEEL_ANG_VELOCITY = 5; // radians per sec
+        public static final double Q_AZIMUTH = 1.5; // radians
+        public static final double Q_WHEEL_ANG_VELOCITY = 5.0; // radians per sec
+        public static final double Q_AZIMUTH_ANG_VELOCITY = 0.8; // radians per sec
+
         // This is for Kalman filter which isn't used for azimuth angle due to angle wrapping.
         // Model noise are assuming that our model isn't as accurate as our senlrs.
-        public static final double MODEL_AZIMUTH_ANGLE_NOISE = .1; // radians
+        public static final double MODEL_AZIMUTH_ANGLE_NOISE = 0.1; // radians
         public static final double MODEL_AZIMUTH_ANG_VELOCITY_NOISE = 5.0; // radians per sec
         public static final double MODEL_WHEEL_ANG_VELOCITY_NOISE = 5.0; // radians per sec
+        
         // Noise from sensors. Falcon With Gearbox causes us to have more uncertainty so we increase
         // the noise.
         public static final double SENSOR_AZIMUTH_ANGLE_NOISE = 0.01; // radians

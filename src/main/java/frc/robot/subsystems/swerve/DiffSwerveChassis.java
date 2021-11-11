@@ -29,6 +29,7 @@ public class DiffSwerveChassis {
 
     public DiffSwerveChassis()
     {
+        System.out.println("Creating diff swerve model");
         this.imu = new NavX();
 
         frontLeft = new DiffSwerveModule(
@@ -100,6 +101,8 @@ public class DiffSwerveChassis {
                                 Constants.DriveTrain.PROFILE_CONSTRAINT_VEL,
                                 Constants.DriveTrain.PROFILE_CONSTRAINT_ACCEL));
         angleController.enableContinuousInput(-Math.PI / 2.0, Math.PI / 2.0);
+        
+        System.out.println("Model created!");
     }
 
     public void setEnabled(boolean is_enabled)

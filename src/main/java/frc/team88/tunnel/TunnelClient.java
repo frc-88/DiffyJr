@@ -102,14 +102,15 @@ public class TunnelClient extends Thread {
                     return;
                 }
                 
-                int last_parsed_index = protocol.parseBuffer(Arrays.copyOfRange(buffer, 0, unparsed_index + num_chars_read));
+                int buffer_stop = unparsed_index + num_chars_read;
+                int last_parsed_index = protocol.parseBuffer(Arrays.copyOfRange(buffer, 0, buffer_stop));
                 if (last_parsed_index > 0)
                 {
-                    for (int index = last_parsed_index, shifted_index = 0; index < buffer.length; index++, shifted_index++) {
+                    for (int index = last_parsed_index, shifted_index = 0; index < buffer_stop; index++, shifted_index++) {
                         buffer[shifted_index] = buffer[index];
                     }
                 }
-                unparsed_index = unparsed_index + num_chars_read - last_parsed_index;
+                unparsed_index = buffer_stop - last_parsed_index;
                 if (unparsed_index >= buffer_size) {
                     unparsed_index = 0;
                 }
