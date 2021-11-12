@@ -192,6 +192,16 @@ public class DiffSwerveModule {
             0.0, 0.0,
             0.0, 0.0
         );
+
+        System.out.println("A: " + A);
+        System.out.println("B: " + B);
+        System.out.println("C: " + C);
+        System.out.println("D: " + D);
+        System.out.println("J_w: " + J_w);
+        System.out.println("K_t: " + K_t);
+        System.out.println("K_v: " + K_v);
+        System.out.println("R: " + R);
+        System.out.println("Inv diff matrix: " + inverseDiffMatrix);
         
         return new LinearSystem<>(A, B, C, D);
     }
@@ -380,13 +390,22 @@ public class DiffSwerveModule {
      * @param state is the desired swerve module state.
      */
     public void setModuleState(SwerveModuleState state) {
-        System.out.println("state: " + state);
+        // System.out.println("state: " + state);
         setReference(
                 VecBuilder.fill(
                         state.angle.getRadians(),
                         swerveControlLoop.getXHat(1),
                         state.speedMetersPerSecond
                                 / Constants.DifferentialSwerveModule.WHEEL_RADIUS));
+    }
+
+    public void setModuleState(double speedMetersPerSecond, double angleRadians) {
+        setReference(
+                VecBuilder.fill(
+                    angleRadians,
+                    swerveControlLoop.getXHat(1),
+                    speedMetersPerSecond
+                            / Constants.DifferentialSwerveModule.WHEEL_RADIUS));
     }
 
 

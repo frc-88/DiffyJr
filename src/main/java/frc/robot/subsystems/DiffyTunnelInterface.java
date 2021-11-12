@@ -58,6 +58,10 @@ public class DiffyTunnelInterface implements TunnelInterface {
             pose.getX(), pose.getY(), pose.getRotation().getRadians(),
             velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, velocity.omegaRadiansPerSecond
         );
+
+        TunnelServer.instance.writePacket("module",
+            0, this.swerve.frontLeft.getWheelVelocity(), this.swerve.frontLeft.getModuleAngle()
+        );
     }
 
     private long getTime() {

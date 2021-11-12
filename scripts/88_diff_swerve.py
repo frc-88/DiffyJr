@@ -17,15 +17,15 @@ import numpy as np
 
 class Constants:
     VOLTAGE = 12.0
-    J_w = 0.005
-    J_a = 0.004
+    J_w = 0.015
+    J_a = 0.014
     DIFF_MATRIX = np.array([
         [1.0/24.0, -1.0/24.0],
         [5.0/72.0, 7.0/72.0],
     ])
-    Q_AZIMUTH = 0.5  # radians
+    Q_AZIMUTH = 0.08  # radians
     Q_WHEEL_ANG_VELOCITY = 5.0  # radians per sec
-    Q_AZIMUTH_ANG_VELOCITY = 0.8  # radians per sec
+    Q_AZIMUTH_ANG_VELOCITY = 1.1  # radians per sec
 
     MODEL_AZIMUTH_ANGLE_NOISE = 0.1  # radians
     MODEL_WHEEL_ANG_VELOCITY_NOISE = 5.0  # radians per sec
@@ -75,7 +75,7 @@ class DiffSwerve(fct.System):
         motor = fct.models.MOTOR_FALCON_500
         K_t = motor.Kt
         K_v = motor.Kv
-        R = motor.R
+        R = motor.R / 2.0
         J_w = Constants.J_w
         J_a = Constants.J_a
         
@@ -100,6 +100,10 @@ class DiffSwerve(fct.System):
         print("B:\n", B)
         print("C:\n", C)
         print("D:\n", D)
+        print("J_w:", J_w)
+        print("K_t:", K_t)
+        print("K_v:", K_v)
+        print("R:", R)
         print("Inv diff matrix:\n", Constants.INV_DIFF_MATRIX)
         return ct.ss(A, B, C, D)
 

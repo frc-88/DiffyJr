@@ -91,14 +91,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        System.out.println("xhat: " + this.swerve.frontLeft.swerveControlLoop.getXHat());
-        System.out.println("r: " + this.swerve.frontLeft.swerveControlLoop.getNextR());
+        // System.out.println("xhat: " + this.swerve.frontLeft.swerveControlLoop.getXHat());
+        // System.out.println("r: " + this.swerve.frontLeft.swerveControlLoop.getNextR());
         if (tunnel.anyClientsAlive() && diffy_interface.isCommandActive()) {
             double x = diffy_interface.getCommandVx();
             double y = diffy_interface.getCommandVy();
             // double t = diffy_interface.getCommandVt();
-            this.swerve.frontLeft.setModuleState(new SwerveModuleState(0.5, new Rotation2d(0.0)));
-            System.out.println("position: " + this.swerve.frontLeft.azimuthSensor.getPosition());
+            this.swerve.frontLeft.setModuleState(Math.sqrt(x * x + y * y), Math.atan2(y, x));
+            // System.out.println("position: " + this.swerve.frontLeft.getModuleAngle());
             // swerve.drive(
             //     diffy_interface.getCommandVx(),
             //     diffy_interface.getCommandVy(),
