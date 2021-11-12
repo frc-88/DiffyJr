@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 
 public class DiffSwerveChassis {
-    private final DiffSwerveModule frontLeft;
-    private final DiffSwerveModule backLeft;
-    private final DiffSwerveModule backRight;
-    private final DiffSwerveModule frontRight;
+    public final DiffSwerveModule frontLeft;
+    public final DiffSwerveModule backLeft;
+    public final DiffSwerveModule backRight;
+    public final DiffSwerveModule frontRight;
 
     private final SwerveDriveKinematics kinematics;
     private final SwerveDriveOdometry odometry;

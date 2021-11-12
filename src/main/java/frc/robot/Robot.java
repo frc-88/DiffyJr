@@ -9,6 +9,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import frc.robot.subsystems.DiffyTunnelInterface;
 import frc.robot.subsystems.SwerveNetworkTable;
 import frc.team88.tunnel.TunnelServer;
@@ -73,7 +75,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        this.swerve.holdDirection();
+        // this.swerve.holdDirection();
     }
 
     @Override
@@ -83,29 +85,37 @@ public class Robot extends TimedRobot {
     }
 
     public void controllerPeriodic() {
-        this.swerve.controllerPeriodic();
+        // this.swerve.controllerPeriodic();
+        this.swerve.frontLeft.update();
     }
 
     @Override
     public void teleopPeriodic() {
+        System.out.println("xhat: " + this.swerve.frontLeft.swerveControlLoop.getXHat());
+        System.out.println("r: " + this.swerve.frontLeft.swerveControlLoop.getNextR());
         if (tunnel.anyClientsAlive() && diffy_interface.isCommandActive()) {
-            swerve.drive(
-                diffy_interface.getCommandVx(),
-                diffy_interface.getCommandVy(),
-                diffy_interface.getCommandVt(),
-                false
-            );
+            double x = diffy_interface.getCommandVx();
+            double y = diffy_interface.getCommandVy();
+            // double t = diffy_interface.getCommandVt();
+            this.swerve.frontLeft.setModuleState(new SwerveModuleState(0.5, new Rotation2d(0.0)));
+            System.out.println("position: " + this.swerve.frontLeft.azimuthSensor.getPosition());
+            // swerve.drive(
+            //     diffy_interface.getCommandVx(),
+            //     diffy_interface.getCommandVy(),
+            //     diffy_interface.getCommandVt(),
+            //     false
+            // );
         }
         else if (this.gamepad.isConnected()) {
-            swerve.drive(
-                MAX_SPEED * this.gamepad.getRawAxis(0),
-                MAX_SPEED * this.gamepad.getRawAxis(1),
-                MAX_ROTATION * this.gamepad.getRawAxis(4),
-                false
-            );
+            // swerve.drive(
+            //     MAX_SPEED * this.gamepad.getRawAxis(0),
+            //     MAX_SPEED * this.gamepad.getRawAxis(1),
+            //     MAX_ROTATION * this.gamepad.getRawAxis(4),
+            //     false
+            // );
         }
         else {
-            this.swerve.holdDirection();
+            // this.swerve.holdDirection();
         }
     }
 

@@ -31,7 +31,7 @@ public class Constants {
         public static final double MAX_CHASSIS_ANG_VEL = Math.toRadians(90.0);  // Maximum chassis rotational velocity (rad/s)
         public static final double MAX_CHASSIS_LINEAR_ACCEL = 0.5; // Maximum chassis linear acceleration (m/s^2)
 
-        public static final double ANGLE_kP = 3.5;
+        public static final double ANGLE_kP = 1.0;
         public static final double ANGLE_kI = 0.0;
         public static final double ANGLE_kD = 0.0;
         public static final double kP = 1.5;
@@ -53,10 +53,10 @@ public class Constants {
         // Differential swerve matrix constants. Matrix shape:
         // | M11   M12 |
         // | M21   M22 |
-        public static final double GEAR_M11 = 5.0/72.0;
-        public static final double GEAR_M12 = 7.0/72.0;
-        public static final double GEAR_M21 = 1.0/24.0;
-        public static final double GEAR_M22 = -1.0/24.0;
+        public static final double GEAR_M11 = 1.0/24.0;
+        public static final double GEAR_M12 = -1.0/24.0;
+        public static final double GEAR_M21 = 5.0/72.0;
+        public static final double GEAR_M22 = 7.0/72.0;
 
         public static final double FALCON_MAX_SPEED_RPS = Units.rotationsPerMinuteToRadiansPerSecond(600.0);  // radians per second
         public static final double WHEEL_RADIUS = 0.04445; // Meters with wheel compression.
@@ -71,8 +71,8 @@ public class Constants {
         public static final double CURRENT_TRIGGER_TIME = 0.0;
 
         // Create Parameters for DiffSwerve State Space
-        public static final double INERTIA_WHEEL = 0.005;  // kg * m^2
-        public static final double INERTIA_STEER = 0.004;  // kg * m^2
+        public static final double INERTIA_WHEEL = 0.015;  // kg * m^2
+        public static final double INERTIA_AZIMUTH = 0.014;  // kg * m^2
         
         // A weight for how aggressive each state should be ie. 0.08 radians will try to control the
         // angle more aggressively than the wheel angular velocity.
@@ -88,9 +88,9 @@ public class Constants {
         
         // Noise from sensors. Falcon With Gearbox causes us to have more uncertainty so we increase
         // the noise.
-        public static final double SENSOR_AZIMUTH_ANGLE_NOISE = 0.01; // radians
+        public static final double SENSOR_AZIMUTH_ANGLE_NOISE = 0.05; // radians
         public static final double SENSOR_AZIMUTH_ANG_VELOCITY_NOISE = 0.1; // radians per sec
         public static final double SENSOR_WHEEL_ANG_VELOCITY_NOISE = 0.1; // radians per sec
-        public static final double CONTROL_EFFORT = VOLTAGE;
+        public static final double CONTROL_EFFORT = VOLTAGE / 12.0;
     }
 }
