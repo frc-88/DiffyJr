@@ -16,10 +16,10 @@ public class DiffSwerveCoeffs {
 
   public static StateSpaceControllerCoeffs<N3, N2, N3>
     makeDiffSwerveControllerCoeffs() {
-    Matrix<N2, N3> K = MatrixUtils.mat(Nat.N2(), Nat.N3()).fill(3.7981895383057065, 0.05039401301169719, -0.20129668988147995, 2.3407389551611453, 0.3337027847738159, 0.299512826500433);
+    Matrix<N2, N3> K = MatrixUtils.mat(Nat.N2(), Nat.N3()).fill(4.109361474689985, 0.08499014906730384, -0.14062843057653684, -0.5936469626100538, 0.12948381291614233, 0.0912257662643821);
     Matrix<N2, N3> Kff = MatrixUtils.mat(Nat.N2(), Nat.N3()).fill(0.0007795019998080929, 0.2898766463158315, -0.09564601551033325, 0.0005383164581840219, 0.1594082337297932, 0.4174064550714919);
-    Matrix<N2, N1> Umin = MatrixUtils.mat(Nat.N2(), Nat.N1()).fill(-12.0, -12.0);
-    Matrix<N2, N1> Umax = MatrixUtils.mat(Nat.N2(), Nat.N1()).fill(12.0, 12.0);
+    Matrix<N2, N1> Umin = MatrixUtils.mat(Nat.N2(), Nat.N1()).fill(-1.0, -1.0);
+    Matrix<N2, N1> Umax = MatrixUtils.mat(Nat.N2(), Nat.N1()).fill(1.0, 1.0);
     return new StateSpaceControllerCoeffs<N3, N2, N3>(K, Kff, Umin, Umax);
   }
 

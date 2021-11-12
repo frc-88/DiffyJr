@@ -44,6 +44,17 @@ class Constants:
     #     [GEAR_RATIO_STEER, -GEAR_RATIO_STEER]
     # ])
 
+def input_modulus(input_num, minimum=-math.pi, maximum=math.pi):
+    modulus = maximum - minimum
+    # return input_num % modulus - minimum
+    num_max = int((input_num - minimum) / modulus)
+    input_num -= num_max * modulus
+
+    num_min = int((input_num - maximum) / modulus)
+    input_num -= num_min * modulus
+
+    return input_num
+
 
 class DiffSwerve(fct.System):
     def __init__(self, dt):
@@ -93,7 +104,12 @@ class DiffSwerve(fct.System):
             [B_subset[0][0], B_subset[0][1]],
             [B_subset[1][0], B_subset[1][1]],
         ])
-        C = np.identity(3)
+        # C = np.identity(3)
+        C = np.array([
+            [1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0],
+        ])
         D = np.zeros((3, 2))
 
         print("A:\n", A)
@@ -129,12 +145,39 @@ class DiffSwerve(fct.System):
         ]
         self.design_kalman_filter(q_model, r_model)
 
+    def update(self, next_r=None):
+        """Advance the model by one timestep.
+
+        Keyword arguments:
+        next_r -- next controller reference (default: current reference)
+        """
+        # update_plant
+        self.x = self.sysd.A @ self.x + self.sysd.B @ self.u
+        self.y = self.sysd.C @ self.x + self.sysd.D @ self.u
+        
+        # correct_observer
+        self.x_hat += self.kalman_gain @ (
+            self.y - self.sysd.C @ self.x_hat - self.sysd.D @ self.u
+        )
+
+        # update_controller
+        error = self.r - self.x_hat
+        angle_error = input_modulus(error[0][0])
+        error[0][0] = angle_error
+        u = self.K @ error
+        uff = self.Kff @ (next_r - self.sysd.A @ self.r)
+        self.r = next_r
+        self.u = np.clip(u + uff, self.u_min, self.u_max)
+
+        # predict_observer
+        self.x_hat = self.sysd.A @ self.x_hat + self.sysd.B @ self.u
+
 
 def main():
     dt = 0.005
     diff_swerve = DiffSwerve(dt)
     # diff_swerve.export_cpp_coeffs("DiffSwerve", "subsystems/")
-    diff_swerve.export_java_coeffs("DiffSwerve")
+    # diff_swerve.export_java_coeffs("DiffSwerve")
 
     # Set up graphing
     l0 = 0.1
@@ -149,7 +192,7 @@ def main():
         if t[i] < l0:
             r = np.array([[0.0], [0.0], [0.0]])
         elif t[i] < l1:
-            r = np.array([[1.0], [0.0], [1.0]])
+            r = np.array([[input_modulus(10.0)], [0.0], [1.0]])
         else:
             r = np.array([[0.0], [0.0], [0.0]])
         refs.append(r)
