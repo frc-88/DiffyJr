@@ -17,6 +17,7 @@ public class DiffSwerveChassis {
     public final DiffSwerveModule backLeft;
     public final DiffSwerveModule backRight;
     public final DiffSwerveModule frontRight;
+    public final DiffSwerveModule[] modules;
 
     private final SwerveDriveKinematics kinematics;
     private final SwerveDriveOdometry odometry;
@@ -64,7 +65,8 @@ public class DiffSwerveChassis {
             RobotMap.DIO.ENCODER_FR,
             Constants.DriveTrain.FRONT_RIGHT_ENCODER_OFFSET
         );
-        
+
+        modules = new DiffSwerveModule[] {frontLeft, backLeft, backRight, frontRight};
 
         kinematics = new SwerveDriveKinematics(
             frontLeft.getModuleLocation(),
@@ -107,10 +109,9 @@ public class DiffSwerveChassis {
 
     public void setEnabled(boolean is_enabled)
     {
-        frontLeft.setEnabled(is_enabled);
-        backLeft.setEnabled(is_enabled);
-        backRight.setEnabled(is_enabled);
-        frontRight.setEnabled(is_enabled);
+        for (DiffSwerveModule module : modules) {
+            module.setEnabled(is_enabled);
+        }
     }
 
     public void periodic() {
@@ -126,10 +127,9 @@ public class DiffSwerveChassis {
 
     public void controllerPeriodic() {
         // Called in separate periodic loop with a faster update rate
-        frontLeft.update();
-        backLeft.update();
-        backRight.update();
-        frontRight.update();
+        for (DiffSwerveModule module : modules) {
+            module.update();
+        }
     }
 
 
@@ -172,18 +172,16 @@ public class DiffSwerveChassis {
 
     // Set wheel velocities to zero and hold module directions
     public void holdDirection() {
-        frontLeft.setIdealState(new SwerveModuleState(0.0, new Rotation2d(frontLeft.getModuleAngle())));
-        backLeft.setIdealState(new SwerveModuleState(0.0, new Rotation2d(backLeft.getModuleAngle())));
-        backRight.setIdealState(new SwerveModuleState(0.0, new Rotation2d(backRight.getModuleAngle())));
-        frontRight.setIdealState(new SwerveModuleState(0.0, new Rotation2d(frontRight.getModuleAngle())));        
+        for (DiffSwerveModule module : modules) {
+            module.setIdealState(new SwerveModuleState(0.0, new Rotation2d(frontLeft.getModuleAngle())));
+        }
         resetAngleSetpoint();
     }
 
     public void setIdealState(SwerveModuleState[] swerveModuleStates) {
-        frontLeft.setIdealState(swerveModuleStates[0]);
-        backLeft.setIdealState(swerveModuleStates[1]);
-        backRight.setIdealState(swerveModuleStates[2]);
-        frontRight.setIdealState(swerveModuleStates[3]);
+        for (int index = 0; index < swerveModuleStates.length; index++) {
+            modules[index].setIdealState(swerveModuleStates[index]);
+        }
     }
 
     private ChassisSpeeds getChassisSpeeds(double vx, double vy, double angularVelocity, boolean fieldRelative, Rotation2d relativeAngle) {
@@ -222,6 +220,11 @@ public class DiffSwerveChassis {
             ChassisSpeeds chassisSpeeds = getChassisSpeeds(vx, vy, angularVelocity, fieldRelative, getHeading());
             SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(chassisSpeeds);
 
+            // System.out.println(">0 modules:");
+            // for (SwerveModuleState state : swerveModuleStates) {
+            //     System.out.println(String.format("\tv=%f, t=%f", state.speedMetersPerSecond, state.angle.getRadians()));
+            // }
+
             SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, Constants.DriveTrain.MAX_CHASSIS_SPEED);
             setIdealState(swerveModuleStates);
             resetAngleSetpoint();
@@ -233,6 +236,10 @@ public class DiffSwerveChassis {
             SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(chassisSpeeds);
             SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, Constants.DriveTrain.MAX_CHASSIS_SPEED);
             setIdealState(swerveModuleStates);
+            // System.out.println("=0 modules:");
+            // for (SwerveModuleState state : swerveModuleStates) {
+            //     System.out.println(String.format("\tv=%f, t=%f", state.speedMetersPerSecond, state.angle.getRadians()));
+            // }
         }
     }
 

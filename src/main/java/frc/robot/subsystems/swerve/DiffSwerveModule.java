@@ -50,7 +50,7 @@ public class DiffSwerveModule {
         hiMotor = initFalconMotor(hiCanID);
         azimuthSensor = new CANifiedPWMEncoder(
             azimuthCanifierID, azimuthPwmChannel, azimuthOffsetRadians,
-            Constants.DifferentialSwerveModule.AZIMUTH_ROTATIONS_TO_RADIANS
+            Constants.DifferentialSwerveModule.AZIMUTH_ROTATIONS_TO_RADIANS, false
         );
 
         diffMatrix = Matrix.mat(Nat.N2(), Nat.N2()).fill(
@@ -247,7 +247,7 @@ public class DiffSwerveModule {
                         swerveControlLoop.getXHat(),
                         -Math.PI,
                         Math.PI))
-                // .plus(feedforwardVoltages)
+                .plus(feedforwardVoltages)
             );
         swerveControlLoop.getObserver().predict(input, Constants.DifferentialSwerveModule.kDt);
     }
@@ -394,20 +394,10 @@ public class DiffSwerveModule {
         setReference(
                 VecBuilder.fill(
                         state.angle.getRadians(),
-                        swerveControlLoop.getXHat(1),
+                        0.0, //swerveControlLoop.getXHat(1),
                         state.speedMetersPerSecond
                                 / Constants.DifferentialSwerveModule.WHEEL_RADIUS));
     }
-
-    public void setModuleState(double speedMetersPerSecond, double angleRadians) {
-        setReference(
-                VecBuilder.fill(
-                    angleRadians,
-                    swerveControlLoop.getXHat(1),
-                    speedMetersPerSecond
-                            / Constants.DifferentialSwerveModule.WHEEL_RADIUS));
-    }
-
 
     /**
      * sets the modules to take the shorted path to the newest state.

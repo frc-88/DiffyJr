@@ -13,8 +13,8 @@ public class RobotMap {
         public static class TALONFX {
             public static final int FL_HI_FALCON = 16;
             public static final int FL_LO_FALCON = 1;
-            public static final int BL_HI_FALCON = 3;
-            public static final int BL_LO_FALCON = 2;
+            public static final int BL_HI_FALCON = 2;
+            public static final int BL_LO_FALCON = 3;
             public static final int BR_HI_FALCON = 12;
             public static final int BR_LO_FALCON = 13;
             public static final int FR_HI_FALCON = 15;

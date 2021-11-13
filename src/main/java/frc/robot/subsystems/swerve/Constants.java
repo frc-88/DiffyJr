@@ -13,8 +13,8 @@ public class Constants {
 
     public static class DriveTrain {
         public static Pose2d robotPose;
-        public static final double WIDTH = 0.154305;
-        public static final double LENGTH = 0.154305;
+        public static final double WIDTH = 0.30861;
+        public static final double LENGTH = 0.30861;
         public static final double FRONT_LEFT_ENCODER_OFFSET = Math.toRadians(136.93);
         public static final double BACK_LEFT_ENCODER_OFFSET = Math.toRadians(-108.635);
         public static final double BACK_RIGHT_ENCODER_OFFSET = Math.toRadians(-46.68);
@@ -24,8 +24,7 @@ public class Constants {
         public static final Translation2d BACK_RIGHT_POSITION = new Translation2d(-WIDTH / 2.0, -LENGTH / 2.0);
         public static final Translation2d FRONT_RIGHT_POSITION = new Translation2d(WIDTH / 2.0, -LENGTH / 2.0);
 
-        public static final double DEADBAND = 0.2;
-        public static final double RACE_WHEEL_DEADBAND = 0.1;
+        public static final double DEADBAND = 0.0001;
 
         public static final double MAX_CHASSIS_SPEED = 4.5;  // Maximum chassis speed (m/s)
         public static final double MAX_CHASSIS_ANG_VEL = Math.toRadians(90.0);  // Maximum chassis rotational velocity (rad/s)
@@ -71,14 +70,14 @@ public class Constants {
         public static final double CURRENT_TRIGGER_TIME = 0.0;
 
         // Create Parameters for DiffSwerve State Space
-        public static final double INERTIA_WHEEL = 0.015;  // kg * m^2
-        public static final double INERTIA_AZIMUTH = 0.014;  // kg * m^2
+        public static final double INERTIA_WHEEL = 0.008;  // kg * m^2
+        public static final double INERTIA_AZIMUTH = 0.005;  // kg * m^2
         
         // A weight for how aggressive each state should be ie. 0.08 radians will try to control the
         // angle more aggressively than the wheel angular velocity.
         public static final double Q_AZIMUTH = 0.08; // radians
-        public static final double Q_WHEEL_ANG_VELOCITY = 5.0; // radians per sec
         public static final double Q_AZIMUTH_ANG_VELOCITY = 1.1; // radians per sec
+        public static final double Q_WHEEL_ANG_VELOCITY = 5.0; // radians per sec
 
         // This is for Kalman filter which isn't used for azimuth angle due to angle wrapping.
         // Model noise are assuming that our model isn't as accurate as our senlrs.
@@ -91,6 +90,6 @@ public class Constants {
         public static final double SENSOR_AZIMUTH_ANGLE_NOISE = 0.05; // radians
         public static final double SENSOR_AZIMUTH_ANG_VELOCITY_NOISE = 0.1; // radians per sec
         public static final double SENSOR_WHEEL_ANG_VELOCITY_NOISE = 0.1; // radians per sec
-        public static final double CONTROL_EFFORT = VOLTAGE / 12.0;
+        public static final double CONTROL_EFFORT = VOLTAGE;
     }
 }

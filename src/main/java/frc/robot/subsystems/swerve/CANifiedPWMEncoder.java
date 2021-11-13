@@ -19,15 +19,19 @@ public class CANifiedPWMEncoder {
   // offset between encoder zero and robot zero (radians)
   private double offset = 0.0;
 
+  // whether encoder is flipped
+  private boolean inverted = false;
+
   /**
    * Constructor.
    *
    * @param canifier The CANifier that the encoder is plugged into
    * @param channel The channel that the encoder is plugged into
    */
-  public CANifiedPWMEncoder(int canifierID, int pwmChannel, double offset, double ratio) {
+  public CANifiedPWMEncoder(int canifierID, int pwmChannel, double offset, double ratio, boolean inverted) {
     this.ratio = ratio;
     this.offset = offset;
+    this.inverted = inverted;
 
     PWMChannel channel;
     switch (pwmChannel) {
@@ -58,6 +62,10 @@ public class CANifiedPWMEncoder {
     this.canifier.setStatusFramePeriod(CANifierStatusFrame.Status_6_PwmInputs3, 5);
   }
 
+  public void setInverted(boolean inverted) {
+    this.inverted = inverted;
+  }
+
   // Returns position in radians
   public double getPosition() {
     double[] dutyAndPeriod = new double[2];
@@ -66,6 +74,6 @@ public class CANifiedPWMEncoder {
       // Sensor is unplugged
       return Double.NaN;
     }
-    return this.ratio * dutyAndPeriod[0] / dutyAndPeriod[1] - this.offset;
+    return this.inverted ? -1.0 : 1.0 * this.ratio * dutyAndPeriod[0] / dutyAndPeriod[1] - this.offset;
   }
 }

@@ -14,7 +14,7 @@ public class TunnelProtocol {
     public static final char PACKET_START_1 = 0x13;
     public static final char PACKET_STOP = '\n';
     public static final char PACKET_SEP = '\t';
-    public static final int MAX_PACKET_LEN = 128;
+    public static final int MAX_PACKET_LEN = 1024;
     public static final int MIN_PACKET_LEN = 13;
     public static final int MAX_SEGMENT_LEN = 64;
     public static final int CHECKSUM_START_INDEX = 4;

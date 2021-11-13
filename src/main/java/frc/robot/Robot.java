@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
@@ -16,6 +17,7 @@ import frc.robot.subsystems.SwerveNetworkTable;
 import frc.team88.tunnel.TunnelServer;
 import frc.robot.subsystems.swerve.Constants;
 import frc.robot.subsystems.swerve.DiffSwerveChassis;
+import frc.robot.subsystems.swerve.DiffSwerveModule;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -85,26 +87,60 @@ public class Robot extends TimedRobot {
     }
 
     public void controllerPeriodic() {
-        // this.swerve.controllerPeriodic();
-        this.swerve.frontLeft.update();
+        this.swerve.controllerPeriodic();
+        // this.swerve.backLeft.update();
+    }
+
+    public void testUpdate() {
+        // TunnelServer.instance.writePacket("module",
+        //     0,
+        //     this.swerve.backLeft.getWheelVelocity(),
+        //     this.swerve.backLeft.getModuleAngle(),
+        //     this.swerve.backLeft.swerveControlLoop.getXHat(0),
+        //     this.swerve.backLeft.swerveControlLoop.getXHat(1),
+        //     this.swerve.backLeft.swerveControlLoop.getXHat(2),
+        //     this.swerve.backLeft.swerveControlLoop.getObserver().getXhat(0),
+        //     this.swerve.backLeft.swerveControlLoop.getObserver().getXhat(1),
+        //     this.swerve.backLeft.swerveControlLoop.getObserver().getXhat(2),
+        //     this.swerve.backLeft.swerveControlLoop.getError(0),
+        //     this.swerve.backLeft.swerveControlLoop.getError(1),
+        //     this.swerve.backLeft.swerveControlLoop.getError(2),
+        //     this.swerve.backLeft.swerveControlLoop.getNextR(0),
+        //     this.swerve.backLeft.swerveControlLoop.getNextR(1),
+        //     this.swerve.backLeft.swerveControlLoop.getNextR(2),
+        //     this.swerve.backLeft.reference.get(0, 0),
+        //     this.swerve.backLeft.reference.get(1, 0),
+        //     this.swerve.backLeft.reference.get(2, 0),
+        //     this.swerve.backLeft.getLoNextVoltage(),
+        //     this.swerve.backLeft.getHiNextVoltage()
+        // );
+        int time = (int)(RobotController.getFPGATime() / 1000000);
+        double angle = 0.0;
+        double speed = 0.0;
+        switch (time % 4) {
+            case 0: angle = 0.0; speed = 0.0; break;
+            case 1: angle = 90.0; speed = 0.5; break;
+            case 2: angle = 180.0; speed = 0.0; break;
+            case 3: angle = 270.0; speed = -0.5; break;
+        
+            default:
+                break;
+        }
+        for (DiffSwerveModule module : this.swerve.modules) {
+            module.setModuleState(new SwerveModuleState(speed, Rotation2d.fromDegrees(angle)));
+        }
     }
 
     @Override
     public void teleopPeriodic() {
-        // System.out.println("xhat: " + this.swerve.frontLeft.swerveControlLoop.getXHat());
-        // System.out.println("r: " + this.swerve.frontLeft.swerveControlLoop.getNextR());
+        // testUpdate();
         if (tunnel.anyClientsAlive() && diffy_interface.isCommandActive()) {
-            double x = diffy_interface.getCommandVx();
-            double y = diffy_interface.getCommandVy();
-            // double t = diffy_interface.getCommandVt();
-            this.swerve.frontLeft.setModuleState(Math.sqrt(x * x + y * y), Math.atan2(y, x));
-            // System.out.println("position: " + this.swerve.frontLeft.getModuleAngle());
-            // swerve.drive(
-            //     diffy_interface.getCommandVx(),
-            //     diffy_interface.getCommandVy(),
-            //     diffy_interface.getCommandVt(),
-            //     false
-            // );
+            swerve.drive(
+                diffy_interface.getCommandVx(),
+                diffy_interface.getCommandVy(),
+                diffy_interface.getCommandVt(),
+                false
+            );
         }
         else if (this.gamepad.isConnected()) {
             // swerve.drive(
