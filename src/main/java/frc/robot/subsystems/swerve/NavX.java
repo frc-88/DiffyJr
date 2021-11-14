@@ -77,4 +77,16 @@ public class NavX {
     public double getVelocityZ() {
         return this.base.getVelocityZ();
     }
+
+    public double getAccelX() {
+        return this.base.getRawAccelX();
+    }
+
+    public double getAccelY() {
+        return this.base.getRawAccelY();
+    }
+
+    public double getAccelZ() {
+        return this.base.getRawAccelZ();
+    }
 }

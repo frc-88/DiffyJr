@@ -24,20 +24,20 @@ public class Constants {
         public static final Translation2d BACK_RIGHT_POSITION = new Translation2d(-WIDTH / 2.0, -LENGTH / 2.0);
         public static final Translation2d FRONT_RIGHT_POSITION = new Translation2d(WIDTH / 2.0, -LENGTH / 2.0);
 
-        public static final double DEADBAND = 0.0001;
+        public static final double DEADBAND = 0.01;
 
         public static final double MAX_CHASSIS_SPEED = 4.5;  // Maximum chassis speed (m/s)
-        public static final double MAX_CHASSIS_ANG_VEL = Math.toRadians(90.0);  // Maximum chassis rotational velocity (rad/s)
+        public static final double MAX_CHASSIS_ANG_VEL = Math.toRadians(360.0);  // Maximum chassis rotational velocity (rad/s)
         public static final double MAX_CHASSIS_LINEAR_ACCEL = 0.5; // Maximum chassis linear acceleration (m/s^2)
 
-        public static final double ANGLE_kP = 1.0;
+        public static final double ANGLE_kP = 8.0;
         public static final double ANGLE_kI = 0.0;
         public static final double ANGLE_kD = 0.0;
         public static final double kP = 1.5;
         public static final double kI = 0.0;
         public static final double kD = 0.5;
-        public static final double PROFILE_CONSTRAINT_VEL = 3.0 * Math.PI;
-        public static final double PROFILE_CONSTRAINT_ACCEL = Math.PI;
+        public static final double PROFILE_CONSTRAINT_VEL = Math.toRadians(360.0);
+        public static final double PROFILE_CONSTRAINT_ACCEL = Math.toRadians(360.0);
     }
 
     public static class DifferentialSwerveModule {

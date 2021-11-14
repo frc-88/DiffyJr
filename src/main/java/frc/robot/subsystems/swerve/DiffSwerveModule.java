@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.LinearSystemLoop;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
@@ -25,22 +24,22 @@ import edu.wpi.first.wpiutil.math.numbers.*;
 
 
 public class DiffSwerveModule {
-    public final TalonFX hiMotor;
-    public final TalonFX loMotor;
+    private final TalonFX hiMotor;
+    private final TalonFX loMotor;
 
-    public final CANifiedPWMEncoder azimuthSensor;
+    private final CANifiedPWMEncoder azimuthSensor;
 
-    public final LinearSystemLoop<N3, N2, N3> swerveControlLoop;
+    private final LinearSystemLoop<N3, N2, N3> swerveControlLoop;
 
-    public Matrix<N3, N1> reference;
-    public Matrix<N2, N1> input;
+    private Matrix<N3, N1> reference;
+    private Matrix<N2, N1> input;
 
-    public Matrix<N2, N2> diffMatrix;
-    public Matrix<N2, N2> inverseDiffMatrix;
+    private Matrix<N2, N2> diffMatrix;
+    private Matrix<N2, N2> inverseDiffMatrix;
 
-    public boolean is_enabled = false;
+    private boolean is_enabled = false;
 
-    public Translation2d moduleLocation;
+    private Translation2d moduleLocation;
 
     public DiffSwerveModule(
             Translation2d moduleLocation,
@@ -363,6 +362,14 @@ public class DiffSwerveModule {
         return input.get(0, 0);
     }
 
+    public double getHiRadiansPerSecond() {
+        return getMotorRadiansPerSecond(hiMotor);
+    }
+
+    public double getLoRadiansPerSecond() {
+        return getMotorRadiansPerSecond(loMotor);
+    }
+
     public double getMotorCurrent(TalonFX motor) {
         return motor.getSupplyCurrent();
     }
@@ -405,15 +412,6 @@ public class DiffSwerveModule {
      * @param state azimuth angle in radians and velocity of wheel in meters per sec.
      */
     public void setIdealState(SwerveModuleState state) {
-        // Rotation2d angleDifference = state.angle.minus(new Rotation2d(getModuleAngle()));
-        // if (Math.abs(angleDifference.getRadians()) > (Math.PI / 2.0)) {
-        //     setModuleState(
-        //             new SwerveModuleState(
-        //                     -state.speedMetersPerSecond,
-        //                     state.angle.rotateBy(new Rotation2d(Math.PI))));
-        // } else {
-        //     setModuleState(state);
-        // }
         setModuleState(SwerveModuleState.optimize(state, new Rotation2d(getModuleAngle())));
     }
 }

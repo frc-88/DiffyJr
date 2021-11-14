@@ -5,8 +5,12 @@ import java.util.Objects;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import frc.robot.subsystems.swerve.DiffSwerveChassis;
+import frc.robot.subsystems.swerve.DiffSwerveModule;
 import frc.team88.tunnel.PacketResult;
 import frc.team88.tunnel.TunnelInterface;
 import frc.team88.tunnel.TunnelServer;
@@ -32,6 +36,7 @@ public class DiffyTunnelInterface implements TunnelInterface {
             {
                 put("ping", "f");
                 put("cmd", "fff");
+                put("reset", "fff");
             }
         };
     }
@@ -48,6 +53,12 @@ public class DiffyTunnelInterface implements TunnelInterface {
         else if (category.equals("ping")) {
             tunnel.writePacket("ping", (double) result.get(0));
         }
+        else if (category.equals("reset")) {
+            double x = (double) result.get(0);
+            double y = (double) result.get(1);
+            double theta = (double) result.get(2);
+            this.swerve.resetOdom(new Pose2d(new Translation2d(x, y), new Rotation2d(theta)));
+        }
     }
 
     @Override
@@ -58,6 +69,24 @@ public class DiffyTunnelInterface implements TunnelInterface {
             pose.getX(), pose.getY(), pose.getRotation().getRadians(),
             velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, velocity.omegaRadiansPerSecond
         );
+        TunnelServer.instance.writePacket("imu",
+            this.swerve.imu.getYaw(), this.swerve.imu.getYawRate(),
+            this.swerve.imu.getAccelX(), this.swerve.imu.getAccelY()
+        );
+        DiffSwerveModule[] modules = this.swerve.getModules();
+        for (int index = 0; index < modules.length; index++) {
+            DiffSwerveModule module = modules[index];
+            SwerveModuleState state = module.getState();
+            TunnelServer.instance.writePacket("module",
+                index,
+                state.angle.getRadians(),
+                state.speedMetersPerSecond,
+                module.getLoNextVoltage(),
+                module.getLoRadiansPerSecond(),
+                module.getHiNextVoltage(),
+                module.getHiRadiansPerSecond()
+            );
+        }
     }
 
     private long getTime() {
