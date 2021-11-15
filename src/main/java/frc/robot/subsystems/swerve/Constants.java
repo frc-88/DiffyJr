@@ -30,7 +30,7 @@ public class Constants {
         public static final double MAX_CHASSIS_ANG_VEL = Math.toRadians(360.0);  // Maximum chassis rotational velocity (rad/s)
         public static final double MAX_CHASSIS_LINEAR_ACCEL = 0.5; // Maximum chassis linear acceleration (m/s^2)
 
-        public static final double ANGLE_kP = 8.0;
+        public static final double ANGLE_kP = 4.0;
         public static final double ANGLE_kI = 0.0;
         public static final double ANGLE_kD = 0.0;
         public static final double kP = 1.5;
@@ -70,7 +70,7 @@ public class Constants {
         public static final double CURRENT_TRIGGER_TIME = 0.0;
 
         // Create Parameters for DiffSwerve State Space
-        public static final double INERTIA_WHEEL = 0.008;  // kg * m^2
+        public static final double INERTIA_WHEEL = 0.015;  // kg * m^2
         public static final double INERTIA_AZIMUTH = 0.005;  // kg * m^2
         
         // A weight for how aggressive each state should be ie. 0.08 radians will try to control the

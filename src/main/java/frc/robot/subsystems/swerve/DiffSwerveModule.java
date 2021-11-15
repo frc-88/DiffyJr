@@ -210,10 +210,6 @@ public class DiffSwerveModule {
         swerveControlLoop.setNextR(reference);
         // updates the kalman filter with new data points.
         Pair<Double, Double> velocities = getAngularVelocities();
-        // System.out.println(String.format("velocities: %f, %f", velocities.getFirst(), velocities.getSecond()));
-        // System.out.println(String.format("voltage [%s]: %f, %f", moduleLocation, getHiNextVoltage(), getLoNextVoltage()));
-        // System.out.println(String.format("Azimuth sensor [%s]: %f", moduleLocation, getModuleAngle()));
-        
         swerveControlLoop.correct(
                 VecBuilder.fill(
                         getModuleAngle(), velocities.getFirst(), velocities.getSecond()));
@@ -234,7 +230,6 @@ public class DiffSwerveModule {
         
         Matrix<N2, N1> inputVelocities = getDifferentialInputs(reference.get(1, 0), reference.get(2, 0));
         Matrix<N2, N1> feedforwardVoltages = inputVelocities.times(Constants.DifferentialSwerveModule.FEED_FORWARD);
-        // System.out.println("feedforwardVoltages: " + feedforwardVoltages);
 
         input = swerveControlLoop.clampInput(
             swerveControlLoop
@@ -401,7 +396,7 @@ public class DiffSwerveModule {
         setReference(
                 VecBuilder.fill(
                         state.angle.getRadians(),
-                        0.0, //swerveControlLoop.getXHat(1),
+                        0.0,
                         state.speedMetersPerSecond
                                 / Constants.DifferentialSwerveModule.WHEEL_RADIUS));
     }
