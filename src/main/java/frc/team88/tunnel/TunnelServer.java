@@ -28,11 +28,12 @@ public class TunnelServer extends Thread {
         this.data_relay_thread = new TunnelDataRelayThread(tunnel_interface, data_relay_delay_ms);
     }
 
-    public boolean anyClientsAlive()
+    public static boolean anyClientsAlive()
     {
-        for (int index = 0; index < clients.size(); index++)
+        for (int index = 0; index < TunnelServer.instance.clients.size(); index++)
         {
-            if (clients.get(index).isAlive() && clients.get(index).isOpen()) {
+            TunnelClient client = TunnelServer.instance.clients.get(index);
+            if (client.isAlive() && client.isOpen()) {
                 return true;
             }
         }
@@ -44,6 +45,7 @@ public class TunnelServer extends Thread {
         for (int index = 0; index < clients.size(); index++)
         {
             if (!clients.get(index).isAlive() || !clients.get(index).isOpen()) {
+                clients.get(index).close();
                 clients.remove(index);
                 index--;
             }
@@ -51,24 +53,23 @@ public class TunnelServer extends Thread {
     }
 
     // Write a packet to all connected clients
-    public void writePacket(String category, Object... objects)
+    public static void writePacket(String category, Object... objects)
     {
-        for (int index = 0; index < clients.size(); index++)
+        for (int index = 0; index < TunnelServer.instance.clients.size(); index++)
         {
-            if (clients.get(index).isAlive() && clients.get(index).isOpen()) {
-                clients.get(index).writePacket(category, objects);
+            TunnelClient client = TunnelServer.instance.clients.get(index);
+            if (client.isAlive() && client.isOpen()) {
+                client.writePacket(category, objects);
             }
         }
     }
 
     // Send message to all clients
-    public void println(String message) {
-        writePacket("__msg__", message);
+    public static void println(String message) {
+        TunnelServer.writePacket("__msg__", message);
     }
 
-    @Override
-    public void run()
-    {
+    private void loop() {
         ServerSocket serverSocket = null;
         Socket socket = null;
 
@@ -104,6 +105,18 @@ public class TunnelServer extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            try {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException e) {  }
+        }
+    }
+
+    @Override
+    public void run()
+    {
+        while (true) {
+            loop();
         }
     }
 }

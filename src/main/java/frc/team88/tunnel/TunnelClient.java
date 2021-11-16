@@ -84,6 +84,18 @@ public class TunnelClient extends Thread {
         }
     }
 
+    public void close() {
+        try {
+            input.close();
+            output.close();
+            socket.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Failed while attempting to close client");
+        }
+    }
+
     public void run()
     {
         if (!Objects.nonNull(input)) {

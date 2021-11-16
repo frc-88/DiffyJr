@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
 
         this.addPeriodic(this::controllerPeriodic, Constants.DifferentialSwerveModule.kDt, 0.0025);
 
-        TunnelServer.instance.println("Diffy Jr is initialized");
+        TunnelServer.println("Diffy Jr is initialized");
     }
 
     @Override
@@ -75,7 +75,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        TunnelServer.instance.println("Diffy Jr teleop enabled");
+        TunnelServer.println("Diffy Jr teleop enabled");
         swerve.setEnabled(true);
     }
 
@@ -85,7 +85,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        if (tunnel.anyClientsAlive() && diffy_interface.isCommandActive()) {
+        if (TunnelServer.anyClientsAlive() && diffy_interface.isCommandActive()) {
             swerve.drive(
                 diffy_interface.getCommandVx(),
                 diffy_interface.getCommandVy(),
