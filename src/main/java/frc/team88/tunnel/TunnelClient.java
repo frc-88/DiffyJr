@@ -44,31 +44,36 @@ public class TunnelClient extends Thread {
     }
 
     public void writePacket(String category, Object... objects) {
-        byte[] packet = protocol.makePacket(category, objects);
-        writeBytes(packet);
-    }
-
-    private void writeBytes(byte[] data) {
+        byte[] data = null;
         try {
             TunnelClient.write_lock.lock();
+            data = protocol.makePacket(category, objects);
             writeBuffer(data);
         }
         catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Failed while writing data: " + TunnelUtil.packetToString(data));
+            if (Objects.isNull(data)) {
+                System.out.println("Failed while writing data: " + TunnelUtil.packetToString(data));
+            }
+            else {
+                System.out.println("Failed while writing uninitialized data");
+            }
             isOpen = false;
         }
         finally {
             TunnelClient.write_lock.unlock();
         }
     }
-
     public boolean isOpen() {
         return isOpen;
     }
 
     private void writeBuffer(byte[] buffer) throws IOException
     {
+        if (buffer.length == 0) {
+            System.out.println("Buffer is empty. Skipping write.");
+            return;
+        }
         if (!Objects.nonNull(output) || !isOpen) {
             System.out.println("Socket is closed! Skipping write.");
             return;

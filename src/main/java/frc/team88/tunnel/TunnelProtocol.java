@@ -78,9 +78,13 @@ public class TunnelProtocol {
                 return new byte[0];
             }
         }
-        applyPacketFooter();
-
-        return Arrays.copyOfRange(write_buffer, 0, write_buffer_index);
+        boolean success = applyPacketFooter();
+        if (success) {
+            return Arrays.copyOfRange(write_buffer, 0, write_buffer_index);
+        }
+        else {
+            return new byte[0];
+        }
     }
 
     private void applyPacketHeader(String category)
@@ -97,8 +101,16 @@ public class TunnelProtocol {
         write_buffer[write_buffer_index++] = PACKET_SEP;
     }
 
-    private void applyPacketFooter()
+    private boolean applyPacketFooter()
     {
+        if (CHECKSUM_START_INDEX > write_buffer_index) {
+            System.out.println(String.format(
+                "Invalid packet! Packet length is greater than checksum start index: %s. write_buffer_index = %d",
+                TunnelUtil.packetToString(write_buffer),
+                write_buffer_index
+            ));
+            return false;
+        }
         byte calc_checksum = calculateChecksum(Arrays.copyOfRange(write_buffer, CHECKSUM_START_INDEX, write_buffer_index));
         
         write_buffer_index = TunnelUtil.copyArray(write_buffer, write_buffer_index,
@@ -110,6 +122,8 @@ public class TunnelProtocol {
             )
         );
         write_buffer[write_buffer_index++] = PACKET_STOP;
+
+        return true;
     }
 
     public byte calculateChecksum(byte[] packet) {
