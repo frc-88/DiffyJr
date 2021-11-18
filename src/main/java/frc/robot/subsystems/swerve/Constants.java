@@ -26,18 +26,20 @@ public class Constants {
 
         public static final double DEADBAND = 0.01;
 
-        public static final double MAX_CHASSIS_SPEED = 4.5;  // Maximum chassis speed (m/s)
-        public static final double MAX_CHASSIS_ANG_VEL = Math.toRadians(360.0);  // Maximum chassis rotational velocity (rad/s)
-        public static final double MAX_CHASSIS_LINEAR_ACCEL = 0.5; // Maximum chassis linear acceleration (m/s^2)
+        public static final double MAX_CHASSIS_SPEED = 4.48;  // Maximum chassis speed (m/s)
+        public static final double MAX_CHASSIS_ANG_VEL = 20.5;  // Maximum chassis rotational velocity (rad/s)
+        public static final double MAX_CHASSIS_LINEAR_ACCEL = 20.0; // Maximum chassis linear acceleration (m/s^2)
+        public static final double MIN_CHASSIS_SPEED = 0.05;  // Minimum chassis speed that isn't zero (m/s)
+        public static final double MIN_CHASSIS_ANG_VEL = 0.1;  // Minimum chassis rotational velocity that isn't zero (rad/s)
 
-        public static final double ANGLE_kP = 4.0;
+        public static final double ANGLE_kP = 3.0;
         public static final double ANGLE_kI = 0.0;
         public static final double ANGLE_kD = 0.0;
         public static final double kP = 1.5;
         public static final double kI = 0.0;
         public static final double kD = 0.5;
-        public static final double PROFILE_CONSTRAINT_VEL = Math.toRadians(360.0);
-        public static final double PROFILE_CONSTRAINT_ACCEL = Math.toRadians(360.0);
+        public static final double PROFILE_CONSTRAINT_VEL = 20.5;
+        public static final double PROFILE_CONSTRAINT_ACCEL = 20.0;
     }
 
     public static class DifferentialSwerveModule {
