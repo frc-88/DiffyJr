@@ -14,6 +14,7 @@ import frc.robot.subsystems.SwerveNetworkTable;
 import frc.team88.tunnel.TunnelServer;
 import frc.robot.subsystems.swerve.Constants;
 import frc.robot.subsystems.swerve.DiffSwerveChassis;
+import frc.robot.subsystems.swerve.Helpers;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -30,6 +31,7 @@ public class Robot extends TimedRobot {
 
     private Joystick gamepad;
     private static final int GAMEPAD_PORT = 0;
+    private static final double JOYSTICK_DEADBAND = 0.1;
     
     @Override
     public void robotInit() {
@@ -94,12 +96,40 @@ public class Robot extends TimedRobot {
             );
         }
         else if (this.gamepad.isConnected()) {
-            swerve.drive(
-                Constants.DriveTrain.MAX_CHASSIS_SPEED * this.gamepad.getRawAxis(0),
-                Constants.DriveTrain.MAX_CHASSIS_SPEED * this.gamepad.getRawAxis(1),
-                Constants.DriveTrain.MAX_CHASSIS_ANG_VEL * this.gamepad.getRawAxis(4),
-                false
-            );
+            double vx = Helpers.applyDeadband(-this.gamepad.getRawAxis(1), JOYSTICK_DEADBAND);
+            double vy = Helpers.applyDeadband(-this.gamepad.getRawAxis(0), JOYSTICK_DEADBAND);
+            double vt = Helpers.applyDeadband(-this.gamepad.getRawAxis(4), JOYSTICK_DEADBAND);
+
+            vx *= Constants.DriveTrain.MAX_CHASSIS_SPEED;
+            vy *= Constants.DriveTrain.MAX_CHASSIS_SPEED;
+            vt *= Constants.DriveTrain.MAX_CHASSIS_ANG_VEL;
+
+            // If magnitude of translation is in the "no-go" zone (_zero_epsilon..._min_linear_cmd),
+            // set vx, vy to _min_linear_cmd with heading applied
+            double trans_vel = Math.sqrt(vx * vx + vy * vy);
+            if (Constants.EPSILON < Math.abs(trans_vel) && Math.abs(trans_vel) < Constants.DriveTrain.MIN_CHASSIS_SPEED)
+            {
+                double trans_angle = Math.atan2(vy, vx);
+                vx = Constants.DriveTrain.MIN_CHASSIS_SPEED * Math.cos(trans_angle);
+                vy = Constants.DriveTrain.MIN_CHASSIS_SPEED * Math.sin(trans_angle);
+            }
+            // If magnitude of translation is in the "zero" zone (<Constants.EPSILON),
+            // Set translation velocity to zero
+            //      If angular velocity is in the "no-go" zone,
+            //      set vt to Constants.DriveTrain.MIN_CHASSIS_ANG_VEL with direction applied
+            //      If angular velocity is in the "zero" zone,
+            //      set vt to zero
+            else if (Math.abs(trans_vel) < Constants.EPSILON) {
+                vx = 0.0;
+                vy = 0.0;
+                if (Constants.EPSILON < Math.abs(vt) && Math.abs(vt) < Constants.DriveTrain.MIN_CHASSIS_ANG_VEL) {
+                    vt = Math.signum(vt) * Constants.DriveTrain.MIN_CHASSIS_ANG_VEL;
+                }
+                else if (Math.abs(vt) < Constants.EPSILON) {
+                    vt = 0.0;
+                }
+            }
+            swerve.drive(vx, vy, vt, false);
         }
         else {
             this.swerve.holdDirection();
