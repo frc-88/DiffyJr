@@ -9,12 +9,18 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.FollowTrajectory;
 import frc.robot.subsystems.DiffyTunnelInterface;
 import frc.robot.subsystems.SwerveNetworkTable;
+import frc.robot.subsystems.TrajectoryBuilder;
 import frc.team88.tunnel.TunnelServer;
 import frc.robot.subsystems.swerve.Constants;
 import frc.robot.subsystems.swerve.DiffSwerveChassis;
 import frc.robot.subsystems.swerve.Helpers;
+import frc.robot.util.TestTrajectories;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -28,6 +34,9 @@ public class Robot extends TimedRobot {
     private TunnelServer tunnel;
     private DiffyTunnelInterface diffy_interface;
     private SwerveNetworkTable swerve_table;
+    // private Trajectory auto_trajectory;
+    // private CommandBase auto_command;
+    private TrajectoryBuilder traj_builder;
 
     private Joystick gamepad;
     private static final int GAMEPAD_PORT = 0;
@@ -36,8 +45,9 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         this.swerve = new DiffSwerveChassis();
+        this.traj_builder = new TrajectoryBuilder();
 
-        diffy_interface = new DiffyTunnelInterface(this.swerve);
+        diffy_interface = new DiffyTunnelInterface(this.swerve, this.traj_builder);
         tunnel = new TunnelServer(diffy_interface, 5800, 15);
         
         tunnel.start();
@@ -47,6 +57,9 @@ public class Robot extends TimedRobot {
 
         this.addPeriodic(this::controllerPeriodic, Constants.DifferentialSwerveModule.kDt, 0.0025);
 
+        // auto_trajectory = TestTrajectories.simpleTest1(this.swerve.getTrajectoryConfig());
+        // auto_command = new FollowTrajectory(this.swerve, auto_trajectory, 1.0);
+
         TunnelServer.println("Diffy Jr is initialized");
     }
 
@@ -55,10 +68,13 @@ public class Robot extends TimedRobot {
         // Happens after mode periodic method
         this.swerve.periodic();
         this.swerve_table.update();
+        CommandScheduler.getInstance().run();
     }
 
     public void disabledInit() {
+        System.out.println("Diffy Jr disabled");
         swerve.setEnabled(false);
+        // auto_command.cancel();
     }
 
     @Override
@@ -68,17 +84,23 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        System.out.println("Diffy Jr autonomous enabled");
+        // this.swerve.resetOdom();
+        // auto_command.schedule();
+        swerve.setEnabled(true);
     }
 
     @Override
     public void autonomousPeriodic() {
-        this.swerve.holdDirection();
+        
     }
 
     @Override
     public void teleopInit() {
         TunnelServer.println("Diffy Jr teleop enabled");
         swerve.setEnabled(true);
+        this.swerve.holdDirection();
+        // auto_command.cancel();
     }
 
     public void controllerPeriodic() {

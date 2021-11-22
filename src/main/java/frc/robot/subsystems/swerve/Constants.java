@@ -40,6 +40,8 @@ public class Constants {
         public static final double kD = 0.5;
         public static final double PROFILE_CONSTRAINT_VEL = 20.5;
         public static final double PROFILE_CONSTRAINT_ACCEL = 20.0;
+
+        public static final double MAX_CENTRIPETAL_ACCEL = 4.5;
     }
 
     public static class DifferentialSwerveModule {

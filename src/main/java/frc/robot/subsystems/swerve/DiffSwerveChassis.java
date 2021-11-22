@@ -9,7 +9,11 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.trajectory.constraint.CentripetalAccelerationConstraint;
+import edu.wpi.first.wpilibj.trajectory.constraint.SwerveDriveKinematicsConstraint;
 
 
 public class DiffSwerveChassis {
@@ -25,6 +29,10 @@ public class DiffSwerveChassis {
     private final HolonomicDriveController controller;
     private final ProfiledPIDController angleController;
     private double angleSetpoint = 0.0;
+
+    private Pose2d globalPose = new Pose2d();
+
+    private final TrajectoryConfig trajectoryConfig;
 
     public final NavX imu;
 
@@ -105,6 +113,26 @@ public class DiffSwerveChassis {
         angleController.enableContinuousInput(-Math.PI / 2.0, Math.PI / 2.0);
         
         System.out.println("Model created!");
+
+        System.out.println("Initializing trajectory config");
+
+        trajectoryConfig = new TrajectoryConfig(
+            Constants.DriveTrain.MAX_CHASSIS_SPEED / 4.0,
+            Constants.DriveTrain.MAX_CHASSIS_LINEAR_ACCEL / 4.0
+        );
+        trajectoryConfig.setKinematics(kinematics);
+        trajectoryConfig.addConstraint(new SwerveDriveKinematicsConstraint(kinematics, Constants.DriveTrain.MAX_CHASSIS_SPEED / 4.0));
+        trajectoryConfig.addConstraint(new CentripetalAccelerationConstraint(Constants.DriveTrain.MAX_CENTRIPETAL_ACCEL / 4.0));
+
+        System.out.println("Diff Swerve Chassis is ready!");
+    }
+
+    public void setGlobalPose(Pose2d globalPose) {
+        this.globalPose = globalPose;
+    }
+
+    public TrajectoryConfig getTrajectoryConfig() {
+        return trajectoryConfig;
     }
 
     public void setEnabled(boolean is_enabled)
@@ -138,6 +166,10 @@ public class DiffSwerveChassis {
 
     public void resetOdom(Pose2d pose) {
         odometry.resetPosition(pose, getImuHeading());
+    }
+
+    public void resetOdom() {
+        odometry.resetPosition(new Pose2d(), getImuHeading());
     }
 
     public ChassisSpeeds getChassisVelocity() {
@@ -229,10 +261,27 @@ public class DiffSwerveChassis {
         }
     }
 
-    public void followPose(Pose2d pose, Rotation2d heading, double vel) {
-        ChassisSpeeds adjustedSpeeds = controller.calculate(odometry.getPoseMeters(), pose, vel, heading);
+    public void followPose(Pose2d currentPose, Pose2d poseRef, double linearVelocityRefMeters)
+    {
+        ChassisSpeeds adjustedSpeeds = controller.calculate(currentPose, poseRef, linearVelocityRefMeters, poseRef.getRotation());
         SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(adjustedSpeeds);
         SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.DriveTrain.MAX_CHASSIS_SPEED);
         setIdealState(moduleStates);
+    }
+
+    public void followPose(Pose2d poseRef, double linearVelocityRefMeters) {
+        followPose(odometry.getPoseMeters(), poseRef, linearVelocityRefMeters);
+    }
+
+    public void followGlobalPose(Pose2d poseRef, double linearVelocityRefMeters) {
+        followPose(globalPose, poseRef, linearVelocityRefMeters);
+    }
+
+    public void followTrajectoryGoal(Trajectory.State goal) {
+        followPose(goal.poseMeters, goal.velocityMetersPerSecond);
+    }
+
+    public void followGlobalTrajectoryGoal(Trajectory.State goal) {
+        followGlobalPose(goal.poseMeters, goal.velocityMetersPerSecond);
     }
 }

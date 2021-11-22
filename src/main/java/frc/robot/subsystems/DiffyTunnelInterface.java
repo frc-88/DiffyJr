@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.commands.FollowTrajectory;
+import frc.robot.subsystems.TrajectoryBuilder.PathValidity;
 import frc.robot.subsystems.swerve.DiffSwerveChassis;
 import frc.robot.subsystems.swerve.DiffSwerveModule;
 import frc.team88.tunnel.PacketResult;
@@ -17,7 +20,9 @@ import frc.team88.tunnel.TunnelServer;
 import frc.team88.tunnel.TunnelClient;
 
 public class DiffyTunnelInterface implements TunnelInterface {
-    private DiffSwerveChassis swerve;
+    private final DiffSwerveChassis swerve;
+    private final TrajectoryBuilder traj_builder;
+
     private long last_command_time = 0;
     private TunnelClient last_command_client;
     private final long ACTIVE_TIME_THRESHOLD = 1_000_000; // microseconds
@@ -25,8 +30,11 @@ public class DiffyTunnelInterface implements TunnelInterface {
     private double commandVy = 0.0;
     private double commandVt = 0.0;
 
-    public DiffyTunnelInterface(DiffSwerveChassis swerve) {
+    private CommandBase follow_traj_command;
+
+    public DiffyTunnelInterface(DiffSwerveChassis swerve, TrajectoryBuilder traj_builder) {
         this.swerve = swerve;
+        this.traj_builder = traj_builder;
     }
 
     @Override
@@ -37,6 +45,8 @@ public class DiffyTunnelInterface implements TunnelInterface {
                 put("ping", "f");
                 put("cmd", "fff");
                 put("reset", "fff");
+                put("global", "fff");
+                put("plan", "ddfff");
             }
         };
     }
@@ -52,6 +62,29 @@ public class DiffyTunnelInterface implements TunnelInterface {
         }
         else if (category.equals("ping")) {
             tunnel.writePacket("ping", (double) result.get(0));
+        }
+        else if (category.equals("global")) {
+            double x = (double) result.get(0);
+            double y = (double) result.get(1);
+            double theta = (double) result.get(2);
+            swerve.setGlobalPose(new Pose2d(x, y, new Rotation2d(theta)));
+        }
+        else if (category.equals("plan")) {
+            int index = (int) result.get(0);
+            int total = (int) result.get(1);
+            double x = (double) result.get(2);
+            double y = (double) result.get(3);
+            double theta = (double) result.get(4);
+            traj_builder.addWaypoint(index, total, new Pose2d(x, y, new Rotation2d(theta)));
+
+            if (traj_builder.getPathValidity() == PathValidity.YES) {
+                if (!Objects.isNull(follow_traj_command)) {
+                    follow_traj_command.cancel();
+                }
+                System.out.println("Running new plan");
+                follow_traj_command = new FollowTrajectory(this.swerve, traj_builder, traj_builder.getTrajectory(this.swerve.getTrajectoryConfig()));
+                follow_traj_command.schedule();
+            }
         }
         else if (category.equals("reset")) {
             double x = (double) result.get(0);
