@@ -65,11 +65,11 @@ public class DiffyTunnelInterface implements TunnelInterface {
     public void update() {
         Pose2d pose = this.swerve.getOdometryPose();
         ChassisSpeeds velocity = this.swerve.getChassisVelocity();
-        TunnelServer.instance.writePacket("odom",
+        TunnelServer.writePacket("odom",
             pose.getX(), pose.getY(), pose.getRotation().getRadians(),
             velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, velocity.omegaRadiansPerSecond
         );
-        TunnelServer.instance.writePacket("imu",
+        TunnelServer.writePacket("imu",
             this.swerve.imu.getYaw(), this.swerve.imu.getYawRate(),
             this.swerve.imu.getAccelX(), this.swerve.imu.getAccelY()
         );
@@ -77,7 +77,7 @@ public class DiffyTunnelInterface implements TunnelInterface {
         for (int index = 0; index < modules.length; index++) {
             DiffSwerveModule module = modules[index];
             SwerveModuleState state = module.getState();
-            TunnelServer.instance.writePacket("module",
+            TunnelServer.writePacket("module",
                 index,
                 state.angle.getRadians(),
                 state.speedMetersPerSecond,
