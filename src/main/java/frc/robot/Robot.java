@@ -9,6 +9,14 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.SendCoprocessorGoal;
+import frc.robot.commands.WaitForCoprocessorPlan;
+import frc.robot.commands.WaitForCoprocessorRunning;
 import frc.robot.subsystems.DiffyTunnelInterface;
 import frc.robot.subsystems.SwerveNetworkTable;
 import frc.team88.tunnel.TunnelServer;
@@ -28,6 +36,7 @@ public class Robot extends TimedRobot {
     private TunnelServer tunnel;
     private DiffyTunnelInterface diffy_interface;
     private SwerveNetworkTable swerve_table;
+    private CommandBase autoCommand;
 
     private Joystick gamepad;
     private static final int GAMEPAD_PORT = 0;
@@ -47,7 +56,22 @@ public class Robot extends TimedRobot {
 
         this.addPeriodic(this::controllerPeriodic, Constants.DifferentialSwerveModule.kDt, 0.0025);
 
+        autoCommand = new SequentialCommandGroup(
+            new SendCoprocessorGoal("goal1", diffy_interface),
+            new SendCoprocessorGoal("goal2", diffy_interface),
+            new SendCoprocessorGoal("goal3", diffy_interface),
+            getWaitForCoprocessorPlan(10.0)
+        );
+
         TunnelServer.println("Diffy Jr is initialized");
+    }
+
+    public CommandBase getWaitForCoprocessorPlan(double waitTime) {
+        return new ParallelRaceGroup(
+            new WaitForCoprocessorRunning(diffy_interface),
+            new WaitForCoprocessorPlan(swerve, diffy_interface),
+            new WaitCommand(10.0)
+        );
     }
 
     @Override
@@ -55,6 +79,7 @@ public class Robot extends TimedRobot {
         // Happens after mode periodic method
         this.swerve.periodic();
         this.swerve_table.update();
+        CommandScheduler.getInstance().run();
     }
 
     public void disabledInit() {
@@ -68,17 +93,22 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        // schedule the autonomous command
+        if (autoCommand != null) {
+            autoCommand.schedule();
+        }
     }
 
     @Override
     public void autonomousPeriodic() {
-        this.swerve.holdDirection();
+        // this.swerve.holdDirection();
     }
 
     @Override
     public void teleopInit() {
         TunnelServer.println("Diffy Jr teleop enabled");
         swerve.setEnabled(true);
+        autoCommand.cancel();
     }
 
     public void controllerPeriodic() {
@@ -88,12 +118,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         if (TunnelServer.anyClientsAlive() && diffy_interface.isCommandActive()) {
-            swerve.drive(
-                diffy_interface.getCommandVx(),
-                diffy_interface.getCommandVy(),
-                diffy_interface.getCommandVt(),
-                false
-            );
+            swerve.drive(diffy_interface.getCommand());
         }
         else if (this.gamepad.isConnected()) {
             double vx = Helpers.applyDeadband(-this.gamepad.getRawAxis(1), JOYSTICK_DEADBAND);

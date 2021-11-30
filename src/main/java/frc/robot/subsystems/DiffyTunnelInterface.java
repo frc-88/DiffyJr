@@ -11,6 +11,10 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import frc.robot.subsystems.swerve.DiffSwerveChassis;
 import frc.robot.subsystems.swerve.DiffSwerveModule;
+import frc.robot.util.GameObject;
+import frc.robot.util.GoalStatus;
+import frc.robot.util.MessageTimer;
+import frc.robot.util.VelocityCommand;
 import frc.team88.tunnel.PacketResult;
 import frc.team88.tunnel.TunnelInterface;
 import frc.team88.tunnel.TunnelServer;
@@ -18,12 +22,21 @@ import frc.team88.tunnel.TunnelClient;
 
 public class DiffyTunnelInterface implements TunnelInterface {
     private DiffSwerveChassis swerve;
-    private long last_command_time = 0;
-    private TunnelClient last_command_client;
-    private final long ACTIVE_TIME_THRESHOLD = 1_000_000; // microseconds
-    private double commandVx = 0.0;
-    private double commandVy = 0.0;
-    private double commandVt = 0.0;
+    
+    private MessageTimer commandTimer = new MessageTimer(1_000_000);
+    private MessageTimer globalPoseTimer = new MessageTimer(1_000_000);
+    private MessageTimer goalStatusTimer = new MessageTimer(1_000_000);
+
+    private VelocityCommand command = new VelocityCommand();
+    
+    private Pose2d globalPose = new Pose2d();
+    
+    private final int maxNumGameObjects = 20;
+    private final GameObject[] gameObjects = new GameObject[maxNumGameObjects];
+    
+    private GoalStatus goalStatus = GoalStatus.INVALID;
+
+    private int num_sent_goals = 0;
 
     public DiffyTunnelInterface(DiffSwerveChassis swerve) {
         this.swerve = swerve;
@@ -44,11 +57,47 @@ public class DiffyTunnelInterface implements TunnelInterface {
     @Override
     public void packetCallback(TunnelClient tunnel, PacketResult result) {
         String category = result.getCategory();
+
         if (category.equals("cmd")) {
-            commandVx = (double) result.get(0);
-            commandVy = (double) result.get(1);
-            commandVt = (double) result.get(2);
-            resetCommandTimer(tunnel);
+            // Velocity commands sent by the coprocessor
+            command.vx = (double) result.get(0);
+            command.vy = (double) result.get(1);
+            command.vt = (double) result.get(2);
+            commandTimer.setTunnelClient(tunnel);
+            commandTimer.reset();
+        }
+        else if (category.equals("global")) {
+            // Global position as declared by the coprocessor
+            globalPose = new Pose2d(
+                (double) result.get(0),
+                (double) result.get(1),
+                new Rotation2d((double) result.get(2))
+            );
+            globalPoseTimer.setTunnelClient(tunnel);
+            globalPoseTimer.reset();
+        }
+        else if (category.equals("obj")) {
+            // Game objects the coprocessor sees
+            int index = (int) result.get(0);
+            if (index < 0 || index >= maxNumGameObjects) {
+                System.out.println("Invalid game object index: " + index);
+                return;
+            }
+            gameObjects[index] = new GameObject(
+                result.getRecvTime(),
+                index,
+                (int) result.get(1),
+                (double) result.get(2),
+                (double) result.get(3)
+            );
+        }
+        else if (category.equals("gstatus")) {
+            // move_base goal status
+            int status = (int) result.get(0);
+            goalStatus = GoalStatus.getStatus(status);
+            
+            goalStatusTimer.setTunnelClient(tunnel);
+            goalStatusTimer.reset();
         }
         else if (category.equals("ping")) {
             tunnel.writePacket("ping", (double) result.get(0));
@@ -89,35 +138,74 @@ public class DiffyTunnelInterface implements TunnelInterface {
         }
     }
 
-    private long getTime() {
-        return RobotController.getFPGATime();
-    }
-
-    private void resetCommandTimer(TunnelClient client) {
-        last_command_time = getTime();
-        last_command_client = client;
-    }
-
-    private boolean isLastTunnelOpen() {
-        if (Objects.isNull(last_command_client)) {
-            return false;
-        }
-        return last_command_client.isAlive() && last_command_client.isOpen();
-    }
+    /***
+     * Getters for data received from coprocessor
+     */
 
     public boolean isCommandActive() {
-        return isLastTunnelOpen() && getTime() - last_command_time < ACTIVE_TIME_THRESHOLD;
+        return commandTimer.isActive();
     }
 
-    public double getCommandVx() {
-        return commandVx;
+    public VelocityCommand getCommand() {
+        return command;
     }
 
-    public double getCommandVy() {
-        return commandVy;
+    public Pose2d getGlobalPose() {
+        return globalPose;
     }
 
-    public double getCommandVt() {
-        return commandVt;
+    public boolean isGlobalPoseActive() {
+        return globalPoseTimer.isActive();
+    }
+
+    public GameObject[] getGameObjects() {
+        return gameObjects;
+    }
+
+    public GoalStatus getGoalStatus() {
+        return goalStatus;
+    }
+
+    public boolean isGoalStatusActive() {
+        return goalStatusTimer.isActive();
+    }
+
+    /***
+     * Setters for sending data to the coprocessor
+     */
+
+    public void sendGoal(Pose2d goalPose) {
+        // TODO: ROS API doesn't allow for Poses mixed in with names for now
+        // num_sent_goals++;
+        // TunnelServer.writePacket("goalp",
+        //     goalPose.getTranslation().getX(),
+        //     goalPose.getTranslation().getY(),
+        //     goalPose.getRotation().getRadians()
+        // );
+    }
+    
+    public void sendGoal(String waypointName) {
+        num_sent_goals++;
+        TunnelServer.writePacket("goaln", waypointName);
+    }
+
+    public void executeGoal() {
+        TunnelServer.writePacket("exec", num_sent_goals);
+    }
+
+    public void cancelGoal() {
+        TunnelServer.writePacket("cancel");
+    }
+    
+    public void sendMatchStatus(boolean motor_enabled, boolean is_autonomous, double match_timer) {
+        TunnelServer.writePacket("match", motor_enabled, is_autonomous, match_timer);
+    }
+
+    public void setPoseEstimate(Pose2d poseEstimation) {
+        TunnelServer.writePacket("poseest",
+            poseEstimation.getTranslation().getX(),
+            poseEstimation.getTranslation().getY(),
+            poseEstimation.getRotation().getRadians()
+        );
     }
 }

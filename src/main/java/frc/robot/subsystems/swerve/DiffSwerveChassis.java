@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import frc.robot.util.VelocityCommand;
 
 
 public class DiffSwerveChassis {
@@ -194,6 +195,10 @@ public class DiffSwerveChassis {
     private void resetAngleSetpoint() {
         this.angleSetpoint = getImuHeading().getRadians();
         angleController.reset(this.angleSetpoint);
+    }
+
+    public void drive(VelocityCommand command) {
+        drive(command.vx, command.vy, command.vt, command.fieldRelative);
     }
 
     /**
