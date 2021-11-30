@@ -29,9 +29,11 @@ public class SendCoprocessorGoal extends CommandBase {
     @Override
     public void initialize() {
         if (!Objects.isNull(waypoint_name)) {
+            System.out.println("Sending waypoint name: " + waypoint_name);
             tunnel_interface.sendGoal(waypoint_name);
         }
         else if (!Objects.isNull(waypoint_pose)) {
+            System.out.println("Sending waypoint pose: " + waypoint_pose);
             tunnel_interface.sendGoal(waypoint_pose);
         }
         else {
@@ -50,11 +52,12 @@ public class SendCoprocessorGoal extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return is_finished || tunnel_interface.getGoalStatus() == GoalStatus.RUNNING;
+        return true;
     }
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("SendCoprocessorPlan command finished");
         if (interrupted) {
             System.out.println("SendCoprocessorPlan was interrupted. Cancelling goal.");
             tunnel_interface.cancelGoal();

@@ -15,6 +15,7 @@ public class WaitForCoprocessorRunning extends CommandBase {
     @Override
     public void initialize() {
         tunnel_interface.executeGoal();
+        System.out.println("Starting WaitForCoprocessorRunning command");
     }
 
     @Override
@@ -24,16 +25,17 @@ public class WaitForCoprocessorRunning extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return tunnel_interface.getGoalStatus() == GoalStatus.RUNNING || !tunnel_interface.isGoalStatusActive();
+        return tunnel_interface.getGoalStatus() != GoalStatus.RUNNING || !tunnel_interface.isGoalStatusActive();
     }
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("WaitForCoprocessorRunning finished");
         if (!tunnel_interface.isGoalStatusActive()) {
             System.out.println("Goal status message is stale! Canceling WaitForCoprocessorRunning");
         }
         if (interrupted) {
-            System.out.println("WaitForCoprocessorRunning was interrupted. Cancelling goal.");
+            System.out.println("WaitForCoprocessorRunning was interrupted. Canceling goal.");
             tunnel_interface.cancelGoal();
         }
     }

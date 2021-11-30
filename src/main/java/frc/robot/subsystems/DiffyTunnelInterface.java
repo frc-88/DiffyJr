@@ -47,8 +47,11 @@ public class DiffyTunnelInterface implements TunnelInterface {
         return new HashMap<String, String>() {
             private static final long serialVersionUID = 1L;
             {
-                put("ping", "f");
                 put("cmd", "fff");
+                put("global", "fff");
+                put("obj", "ddff");
+                put("gstatus", "d");
+                put("ping", "f");
                 put("reset", "fff");
             }
         };
@@ -190,7 +193,9 @@ public class DiffyTunnelInterface implements TunnelInterface {
     }
 
     public void executeGoal() {
+        System.out.println("Sending execute command. Num waypoints: " + num_sent_goals);
         TunnelServer.writePacket("exec", num_sent_goals);
+        num_sent_goals = 0;
     }
 
     public void cancelGoal() {

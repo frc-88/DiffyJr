@@ -60,18 +60,32 @@ public class Robot extends TimedRobot {
             new SendCoprocessorGoal("goal1", diffy_interface),
             new SendCoprocessorGoal("goal2", diffy_interface),
             new SendCoprocessorGoal("goal3", diffy_interface),
-            getWaitForCoprocessorPlan(10.0)
+            getWaitForCoprocessorPlan(30.0),
+            new SendCoprocessorGoal("goal4", diffy_interface),
+            new SendCoprocessorGoal("goal5", diffy_interface),
+            getWaitForCoprocessorPlan(30.0)
         );
 
         TunnelServer.println("Diffy Jr is initialized");
     }
 
     public CommandBase getWaitForCoprocessorPlan(double waitTime) {
-        return new ParallelRaceGroup(
-            new WaitForCoprocessorRunning(diffy_interface),
-            new WaitForCoprocessorPlan(swerve, diffy_interface),
-            new WaitCommand(10.0)
+        CommandBase waitForPlanCommand = new SequentialCommandGroup(
+            new ParallelRaceGroup(
+                new WaitForCoprocessorRunning(diffy_interface),
+                new WaitCommand(1.0)
+            ),
+            new WaitForCoprocessorPlan(swerve, diffy_interface)
         );
+        if (waitTime <= 0.0) {
+            return waitForPlanCommand;
+        }
+        else {
+            return new ParallelRaceGroup(
+                waitForPlanCommand,
+                new WaitCommand(waitTime)
+            );
+        }
     }
 
     @Override
