@@ -56,8 +56,11 @@ public class TunnelProtocol {
     {
         applyPacketHeader(category);
         for (Object object : args) {
-            if (object instanceof Integer || object instanceof Boolean) {
+            if (object instanceof Integer) {
                 write_buffer_index = TunnelUtil.copyArray(write_buffer, write_buffer_index, TunnelUtil.toInt32Bytes((int)object));
+            }
+            else if (object instanceof Boolean) {
+                write_buffer_index = TunnelUtil.copyArray(write_buffer, write_buffer_index, TunnelUtil.toInt32Bytes((boolean)object ? 1 : 0));
             }
             else if (object instanceof Double) {
                 write_buffer_index = TunnelUtil.copyArray(write_buffer, write_buffer_index, TunnelUtil.toFloatBytes((double)object));

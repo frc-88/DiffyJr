@@ -29,6 +29,7 @@ public class WaitForCoprocessorPlan extends CommandBase {
         
         switch (tunnel_interface.getGoalStatus()) {
             case RUNNING:
+                break;
             case INVALID: 
                 System.out.println("Coprocessor entered into state INVALID. Cancelling goal.");
                 cancelGoal();

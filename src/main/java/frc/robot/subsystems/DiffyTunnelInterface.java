@@ -176,20 +176,14 @@ public class DiffyTunnelInterface implements TunnelInterface {
     /***
      * Setters for sending data to the coprocessor
      */
-
-    public void sendGoal(Pose2d goalPose) {
-        // TODO: ROS API doesn't allow for Poses mixed in with names for now
-        // num_sent_goals++;
-        // TunnelServer.writePacket("goalp",
-        //     goalPose.getTranslation().getX(),
-        //     goalPose.getTranslation().getY(),
-        //     goalPose.getRotation().getRadians()
-        // );
-    }
     
-    public void sendGoal(String waypointName) {
+    public void sendGoal(String waypointName, boolean is_continuous, boolean ignore_orientation) {
+        if (num_sent_goals == 0) {
+            is_continuous = false;
+            System.out.println("First goal must be discontinuous. Setting waypoint to discontinuous");
+        }
+        TunnelServer.writePacket("goal", waypointName, is_continuous, ignore_orientation);
         num_sent_goals++;
-        TunnelServer.writePacket("goaln", waypointName);
     }
 
     public void executeGoal() {

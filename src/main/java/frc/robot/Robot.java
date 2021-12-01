@@ -56,16 +56,6 @@ public class Robot extends TimedRobot {
 
         this.addPeriodic(this::controllerPeriodic, Constants.DifferentialSwerveModule.kDt, 0.0025);
 
-        autoCommand = new SequentialCommandGroup(
-            new SendCoprocessorGoal("goal1", diffy_interface),
-            new SendCoprocessorGoal("goal2", diffy_interface),
-            new SendCoprocessorGoal("goal3", diffy_interface),
-            getWaitForCoprocessorPlan(30.0),
-            new SendCoprocessorGoal("goal4", diffy_interface),
-            new SendCoprocessorGoal("goal5", diffy_interface),
-            getWaitForCoprocessorPlan(30.0)
-        );
-
         TunnelServer.println("Diffy Jr is initialized");
     }
 
@@ -73,7 +63,7 @@ public class Robot extends TimedRobot {
         CommandBase waitForPlanCommand = new SequentialCommandGroup(
             new ParallelRaceGroup(
                 new WaitForCoprocessorRunning(diffy_interface),
-                new WaitCommand(1.0)
+                new WaitCommand(0.5)
             ),
             new WaitForCoprocessorPlan(swerve, diffy_interface)
         );
@@ -107,6 +97,17 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        TunnelServer.println("Diffy Jr auto enabled");
+        swerve.setEnabled(true);
+        autoCommand = new SequentialCommandGroup(
+            new SendCoprocessorGoal("goal1", diffy_interface),
+            new SendCoprocessorGoal("goal2", diffy_interface, true),
+            new SendCoprocessorGoal("goal3", diffy_interface, true),
+            new SendCoprocessorGoal("goal4", diffy_interface),
+            new SendCoprocessorGoal("goal5", diffy_interface, true, false),
+            getWaitForCoprocessorPlan(30.0)
+        );
+
         // schedule the autonomous command
         if (autoCommand != null) {
             autoCommand.schedule();
@@ -122,7 +123,9 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         TunnelServer.println("Diffy Jr teleop enabled");
         swerve.setEnabled(true);
-        autoCommand.cancel();
+        if (autoCommand != null) {
+            autoCommand.cancel();
+        }
     }
 
     public void controllerPeriodic() {
