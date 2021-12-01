@@ -105,6 +105,7 @@ public class Robot extends TimedRobot {
             new SendCoprocessorGoal("goal3", diffy_interface, true),
             new SendCoprocessorGoal("goal4", diffy_interface),
             new SendCoprocessorGoal("goal5", diffy_interface, true, false),
+            new SendCoprocessorGoal("goal1", diffy_interface, false, true),
             getWaitForCoprocessorPlan(30.0)
         );
 
