@@ -101,11 +101,11 @@ public class Robot extends TimedRobot {
         swerve.setEnabled(true);
         autoCommand = new SequentialCommandGroup(
             new SendCoprocessorGoal("goal1", diffy_interface),
-            new SendCoprocessorGoal("goal2", diffy_interface, true),
-            new SendCoprocessorGoal("goal3", diffy_interface, true),
+            new SendCoprocessorGoal("goal2", diffy_interface).makeContinuous(true),
+            new SendCoprocessorGoal("goal3", diffy_interface).makeContinuous(true),
             new SendCoprocessorGoal("goal4", diffy_interface),
-            new SendCoprocessorGoal("goal5", diffy_interface, true, false),
-            new SendCoprocessorGoal("goal1", diffy_interface, false, true),
+            new SendCoprocessorGoal("goal5", diffy_interface),
+            new SendCoprocessorGoal("goal1", diffy_interface).makeIgnoreOrientation(false),
             getWaitForCoprocessorPlan(30.0)
         );
 
