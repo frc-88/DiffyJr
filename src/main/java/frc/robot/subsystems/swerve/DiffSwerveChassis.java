@@ -26,6 +26,7 @@ public class DiffSwerveChassis {
     private final HolonomicDriveController controller;
     private final ProfiledPIDController angleController;
     private double angleSetpoint = 0.0;
+    private boolean angleControllerEnabled = true;
 
     public final NavX imu;
 
@@ -115,6 +116,10 @@ public class DiffSwerveChassis {
         }
     }
 
+    public void setAngleControllerEnabled(boolean is_enabled) {
+        this.angleControllerEnabled = is_enabled;
+    }
+
     public void periodic() {
         // Called in main periodic callback in Robot
         odometry.update(
@@ -139,6 +144,10 @@ public class DiffSwerveChassis {
 
     public void resetOdom(Pose2d pose) {
         odometry.resetPosition(pose, getImuHeading());
+    }
+    
+    public void resetImu() {
+        imu.reset();
     }
 
     public ChassisSpeeds getChassisVelocity() {
@@ -216,7 +225,7 @@ public class DiffSwerveChassis {
             // if setpoints are almost zero, set chassis to hold position
             holdDirection();
         }
-        else if (Math.abs(angularVelocity) > 0) {
+        else if (!angleControllerEnabled || Math.abs(angularVelocity) > 0) {
             // if translation and rotation are significant, push setpoints as-is
             ChassisSpeeds chassisSpeeds = getChassisSpeeds(vx, vy, angularVelocity, fieldRelative, getImuHeading());
             SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(chassisSpeeds);

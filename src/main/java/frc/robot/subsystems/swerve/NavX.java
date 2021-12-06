@@ -89,4 +89,8 @@ public class NavX {
     public double getAccelZ() {
         return this.base.getRawAccelZ();
     }
+
+    public void reset() {
+        this.base.reset();
+    }
 }

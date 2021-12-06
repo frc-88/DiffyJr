@@ -396,7 +396,7 @@ public class DiffSwerveModule {
         setReference(
                 VecBuilder.fill(
                         state.angle.getRadians(),
-                        0.0,
+                        0.0,  // swerveControlLoop.getXHat(1)
                         state.speedMetersPerSecond
                                 / Constants.DifferentialSwerveModule.WHEEL_RADIUS));
     }

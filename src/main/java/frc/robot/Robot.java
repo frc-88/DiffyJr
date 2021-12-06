@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         this.swerve = new DiffSwerveChassis();
+        // this.swerve.setAngleControllerEnabled(false);
 
         diffy_interface = new DiffyTunnelInterface(this.swerve);
         tunnel = new TunnelServer(diffy_interface, 5800, 15);
@@ -127,6 +128,7 @@ public class Robot extends TimedRobot {
         if (autoCommand != null) {
             autoCommand.cancel();
         }
+        this.swerve.resetImu();
     }
 
     public void controllerPeriodic() {

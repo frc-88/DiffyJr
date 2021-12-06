@@ -47,7 +47,7 @@ public class DiffyTunnelInterface implements TunnelInterface {
         return new HashMap<String, String>() {
             private static final long serialVersionUID = 1L;
             {
-                put("cmd", "fff");
+                put("cmd", "fffd");
                 put("global", "fff");
                 put("obj", "ddff");
                 put("gstatus", "d");
@@ -66,6 +66,7 @@ public class DiffyTunnelInterface implements TunnelInterface {
             command.vx = (double) result.get(0);
             command.vy = (double) result.get(1);
             command.vt = (double) result.get(2);
+            command.fieldRelative = ((int) result.get(3)) == 1;
             commandTimer.setTunnelClient(tunnel);
             commandTimer.reset();
         }

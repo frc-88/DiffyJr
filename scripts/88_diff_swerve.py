@@ -24,16 +24,16 @@ class Constants:
         [5.0/72.0, 7.0/72.0],
     ])
     Q_AZIMUTH = 0.08  # radians
-    Q_WHEEL_ANG_VELOCITY = 5.0  # radians per sec
     Q_AZIMUTH_ANG_VELOCITY = 1.1  # radians per sec
+    Q_WHEEL_ANG_VELOCITY = 1.0  # radians per sec
 
     MODEL_AZIMUTH_ANGLE_NOISE = 0.1  # radians
-    MODEL_WHEEL_ANG_VELOCITY_NOISE = 5.0  # radians per sec
     MODEL_AZIMUTH_ANG_VELOCITY_NOISE = 5.0  # radians per sec
+    MODEL_WHEEL_ANG_VELOCITY_NOISE = 5.0  # radians per sec
 
     SENSOR_AZIMUTH_ANGLE_NOISE = 0.5  # radians
-    SENSOR_WHEEL_ANG_VELOCITY_NOISE = 0.1  # radians per sec
     SENSOR_AZIMUTH_ANG_VELOCITY_NOISE = 0.1  # radians per sec
+    SENSOR_WHEEL_ANG_VELOCITY_NOISE = 0.1  # radians per sec
 
     INV_DIFF_MATRIX = np.linalg.pinv(DIFF_MATRIX)
 
@@ -188,13 +188,16 @@ def main():
 
     refs = []
 
+    angles = np.arange(0.0, len(t), 0.005)
+
     # Generate references for simulation
     for i in range(len(t)):
         if t[i] < l0:
             r = np.array([[0.0], [0.0], [0.0]])
         elif t[i] < l1:
-            # r = np.array([[input_modulus(10.0)], [0.0], [1.0]])
-            r = np.array([[0.0], [0.0], [0.05]])
+            r = np.array([[input_modulus(angles[i])], [0.0], [4.48]])
+            # r = np.array([[input_modulus(10.0)], [0.0], [4.48]])
+            # r = np.array([[0.0], [0.0], [0.05]])
         else:
             r = np.array([[0.0], [0.0], [0.0]])
         refs.append(r)
