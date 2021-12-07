@@ -91,6 +91,7 @@ public class TunnelClient extends Thread {
 
     public void close() {
         try {
+            System.out.println("Closing tunnel client");
             input.close();
             output.close();
             socket.close();
