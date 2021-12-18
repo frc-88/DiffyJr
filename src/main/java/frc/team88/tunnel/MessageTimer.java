@@ -1,9 +1,10 @@
-package frc.robot.util;
+package frc.team88.tunnel;
 
 import java.util.Objects;
 
 import edu.wpi.first.wpilibj.RobotController;
 import frc.team88.tunnel.TunnelClient;
+import frc.team88.tunnel.MessageTimer;
 
 public class MessageTimer {
     private long last_time = 0;

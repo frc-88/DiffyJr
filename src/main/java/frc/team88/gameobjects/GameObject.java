@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.team88.gameobjects;
 
 public class GameObject {
     public final int obj_class;

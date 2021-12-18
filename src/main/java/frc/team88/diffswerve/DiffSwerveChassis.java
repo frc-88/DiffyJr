@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerve;
+package frc.team88.diffswerve;
 
 import edu.wpi.first.wpilibj.controller.HolonomicDriveController;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -10,10 +10,11 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import frc.robot.util.VelocityCommand;
+import frc.team88.chassis.ChassisInterface;
+import frc.team88.chassis.VelocityCommand;
 
 
-public class DiffSwerveChassis {
+public class DiffSwerveChassis implements ChassisInterface {
     private final DiffSwerveModule frontLeft;
     private final DiffSwerveModule backLeft;
     private final DiffSwerveModule backRight;

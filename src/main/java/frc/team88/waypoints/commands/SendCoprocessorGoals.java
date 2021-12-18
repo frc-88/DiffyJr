@@ -1,11 +1,11 @@
-package frc.robot.commands;
+package frc.team88.waypoints.commands;
 
 import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DiffyTunnelInterface;
-import frc.robot.util.Waypoint;
-import frc.robot.util.WaypointsPlan;
+import frc.team88.waypoints.Waypoint;
+import frc.team88.waypoints.WaypointsPlan;
 
 public class SendCoprocessorGoals extends CommandBase {
     private WaypointsPlan plan;

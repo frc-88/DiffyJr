@@ -1,16 +1,16 @@
-package frc.robot.commands;
+package frc.team88.waypoints.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DiffyTunnelInterface;
-import frc.robot.subsystems.swerve.DiffSwerveChassis;
+import frc.team88.chassis.ChassisInterface;
 import frc.team88.tunnel.TunnelServer;
 
 public class WaitForCoprocessorPlan extends CommandBase {
-    private final DiffSwerveChassis chassis;
+    private final ChassisInterface chassis;
     private final DiffyTunnelInterface tunnel_interface;
     private boolean is_finished = false;
     
-    public WaitForCoprocessorPlan(DiffSwerveChassis chassis, DiffyTunnelInterface tunnel_interface)
+    public WaitForCoprocessorPlan(ChassisInterface chassis, DiffyTunnelInterface tunnel_interface)
     {
         this.chassis = chassis;
         this.tunnel_interface = tunnel_interface;

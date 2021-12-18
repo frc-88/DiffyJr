@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.team88.waypoints;
 
 public class Waypoint {
     public String waypoint_name = "";

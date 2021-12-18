@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerve;
+package frc.team88.diffswerve;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;

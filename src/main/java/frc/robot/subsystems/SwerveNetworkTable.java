@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.listeners.PingListener;
 import frc.robot.listeners.SetOdomListener;
-import frc.robot.subsystems.swerve.DiffSwerveChassis;
-import frc.robot.listeners.CommandListener;
+import frc.team88.diffswerve.DiffSwerveChassis;
+
 
 public class SwerveNetworkTable extends SubsystemBase {
     /**
@@ -21,7 +21,6 @@ public class SwerveNetworkTable extends SubsystemBase {
 
     private NetworkTable table;
     private NetworkTable clientTable;
-    private NetworkTable commandsTable;
     private NetworkTable setOdomTable;
     private NetworkTableEntry clientTimestamp;
     private NetworkTableEntry hostTimestamp;
@@ -34,7 +33,6 @@ public class SwerveNetworkTable extends SubsystemBase {
     private final String rootTableName = "swerveLibrary";
 
     private PingListener ntPingListener;
-    private CommandListener ntCommandListener;
     private SetOdomListener setOdomListener;
 
     private DriverStation m_driverStationInstance;
@@ -47,7 +45,6 @@ public class SwerveNetworkTable extends SubsystemBase {
 
         table = NetworkTableInstance.getDefault().getTable(rootTableName);  // Data and commands from the RoboRIO
         clientTable = table.getSubTable("ROS");  // Data from the Jetson
-        commandsTable = table.getSubTable("commands");  // Commands from the Jetson
         setOdomTable = clientTable.getSubTable("setOdom");
         clientTimestamp = clientTable.getEntry("timestamp");
         hostTimestamp = table.getEntry("timestamp");
@@ -58,10 +55,6 @@ public class SwerveNetworkTable extends SubsystemBase {
 
         ntPingListener = new PingListener();
         ntPingListener.setTable(clientTable);
-
-        ntCommandListener = new CommandListener();
-        ntCommandListener.setTable(commandsTable);
-        commandsTable.addEntryListener("timestamp", ntCommandListener, EntryListenerFlags.kUpdate);
 
         setOdomListener = new SetOdomListener(m_swerve);
         setOdomListener.setTable(setOdomTable);
@@ -81,11 +74,6 @@ public class SwerveNetworkTable extends SubsystemBase {
     public boolean isConnected()
     {
         return clientTimestamp.exists() && hostTimestamp.exists() && (getTime() - clientTimestamp.getLastChange() < clientConnectedTimeout);
-    }
-
-    public boolean isCommandActive()
-    {
-        return isConnected() && ntCommandListener.isActive();
     }
 
     public void update()

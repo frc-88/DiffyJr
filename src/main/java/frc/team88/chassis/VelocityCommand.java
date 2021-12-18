@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.team88.chassis;
 
 public class VelocityCommand {
     public double vx = 0.0; 

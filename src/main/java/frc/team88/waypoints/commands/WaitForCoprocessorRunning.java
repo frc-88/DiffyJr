@@ -1,8 +1,8 @@
-package frc.robot.commands;
+package frc.team88.waypoints.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DiffyTunnelInterface;
-import frc.robot.util.GoalStatus;
+import frc.team88.waypoints.GoalStatus;
 
 public class WaitForCoprocessorRunning extends CommandBase {
     private final DiffyTunnelInterface tunnel_interface;

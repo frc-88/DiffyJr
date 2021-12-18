@@ -15,17 +15,17 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-import frc.robot.commands.SendCoprocessorGoals;
-import frc.robot.commands.WaitForCoprocessorPlan;
-import frc.robot.commands.WaitForCoprocessorRunning;
+import frc.team88.waypoints.commands.SendCoprocessorGoals;
+import frc.team88.waypoints.commands.WaitForCoprocessorPlan;
+import frc.team88.waypoints.commands.WaitForCoprocessorRunning;
 import frc.robot.subsystems.DiffyTunnelInterface;
 import frc.robot.subsystems.SwerveNetworkTable;
 import frc.team88.tunnel.TunnelServer;
-import frc.robot.subsystems.swerve.Constants;
-import frc.robot.subsystems.swerve.DiffSwerveChassis;
-import frc.robot.subsystems.swerve.Helpers;
-import frc.robot.util.Waypoint;
-import frc.robot.util.WaypointsPlan;
+import frc.team88.diffswerve.Constants;
+import frc.team88.diffswerve.DiffSwerveChassis;
+import frc.team88.diffswerve.Helpers;
+import frc.team88.waypoints.Waypoint;
+import frc.team88.waypoints.WaypointsPlan;
 
 /**
  * The VM is configured to automatically run this class, and to call the

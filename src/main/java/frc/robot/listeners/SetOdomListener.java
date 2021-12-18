@@ -6,7 +6,7 @@ import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.networktables.TableEntryListener;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import frc.robot.subsystems.swerve.DiffSwerveChassis;
+import frc.team88.diffswerve.DiffSwerveChassis;
 
 
 /** Handles callbacks for when the command subtable is updated */
