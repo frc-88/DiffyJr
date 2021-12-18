@@ -2,13 +2,13 @@ package frc.team88.waypoints;
 
 import java.util.ArrayList;
 
-import frc.robot.subsystems.DiffyTunnelInterface;
+import frc.team88.tunnel.ROSInterface;
 
 public class WaypointsPlan {
     private ArrayList<Waypoint> waypoints = new ArrayList<>();
-    private final DiffyTunnelInterface tunnel_interface;
+    private final ROSInterface tunnel_interface;
 
-    public WaypointsPlan(DiffyTunnelInterface tunnel_interface) {
+    public WaypointsPlan(ROSInterface tunnel_interface) {
         this.tunnel_interface = tunnel_interface;
     }
     
