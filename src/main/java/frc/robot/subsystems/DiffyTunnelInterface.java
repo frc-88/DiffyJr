@@ -15,6 +15,8 @@ import frc.robot.util.GameObject;
 import frc.robot.util.GoalStatus;
 import frc.robot.util.MessageTimer;
 import frc.robot.util.VelocityCommand;
+import frc.robot.util.Waypoint;
+import frc.robot.util.WaypointsPlan;
 import frc.team88.tunnel.PacketResult;
 import frc.team88.tunnel.TunnelInterface;
 import frc.team88.tunnel.TunnelServer;
@@ -30,6 +32,7 @@ public class DiffyTunnelInterface implements TunnelInterface {
     private VelocityCommand command = new VelocityCommand();
     
     private Pose2d globalPose = new Pose2d();
+    WaypointsPlan plan;
     
     private final int maxNumGameObjects = 20;
     private final GameObject[] gameObjects = new GameObject[maxNumGameObjects];
@@ -40,6 +43,14 @@ public class DiffyTunnelInterface implements TunnelInterface {
 
     public DiffyTunnelInterface(DiffSwerveChassis swerve) {
         this.swerve = swerve;
+
+        plan = new WaypointsPlan(this);
+        plan.addWaypoint(new Waypoint("goal1"));
+        plan.addWaypoint(new Waypoint("goal2").makeContinuous(true));
+        plan.addWaypoint(new Waypoint("goal3").makeContinuous(true));
+        plan.addWaypoint(new Waypoint("goal4"));
+        plan.addWaypoint(new Waypoint("goal5"));
+        plan.addWaypoint(new Waypoint("goal1").makeIgnoreOrientation(false));
     }
 
     @Override
@@ -53,6 +64,7 @@ public class DiffyTunnelInterface implements TunnelInterface {
                 put("gstatus", "d");
                 put("ping", "f");
                 put("reset", "fff");
+                put("general", "d");
             }
         };
     }
@@ -111,6 +123,18 @@ public class DiffyTunnelInterface implements TunnelInterface {
             double y = (double) result.get(1);
             double theta = (double) result.get(2);
             this.swerve.resetOdom(new Pose2d(new Translation2d(x, y), new Rotation2d(theta)));
+        }
+        else if (category.equals("general")) {
+            int general_cmd = (int) result.get(0);
+            switch (general_cmd) {
+                case 1:
+                    plan.sendWaypoints();
+                    break;
+                case 2:
+                    this.swerve.resetImu();
+                default:
+                    break;
+            }
         }
     }
 
@@ -197,6 +221,11 @@ public class DiffyTunnelInterface implements TunnelInterface {
         TunnelServer.writePacket("cancel");
     }
     
+    public void resetPlan() {
+        num_sent_goals = 0;
+        TunnelServer.writePacket("reset");
+    }
+
     public void sendMatchStatus(boolean motor_enabled, boolean is_autonomous, double match_timer) {
         TunnelServer.writePacket("match", motor_enabled, is_autonomous, match_timer);
     }
