@@ -21,10 +21,7 @@ public class WaypointsPlan {
         
         System.out.println("Sending waypoints plan of length " + this.waypoints.size());
         for (int index = 0; index < this.waypoints.size(); index++) {
-            tunnel_interface.sendGoal(
-                this.waypoints.get(index).waypoint_name,
-                this.waypoints.get(index).is_continuous,
-                this.waypoints.get(index).ignore_orientation);
+            tunnel_interface.sendGoal(this.waypoints.get(index));
         }
         tunnel_interface.executeGoal();
         System.out.println("Executing plan");

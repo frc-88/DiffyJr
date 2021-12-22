@@ -1,26 +1,18 @@
 package frc.team88.tunnel;
 
 import java.util.HashMap;
-import java.util.Objects;
 
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 
 import frc.team88.chassis.ChassisInterface;
 import frc.team88.chassis.VelocityCommand;
 import frc.team88.gameobjects.GameObject;
 import frc.team88.waypoints.GoalStatus;
 import frc.team88.waypoints.Waypoint;
-import frc.team88.waypoints.WaypointsPlan;
-import frc.team88.tunnel.MessageTimer;
-import frc.team88.tunnel.PacketResult;
-import frc.team88.tunnel.TunnelInterface;
-import frc.team88.tunnel.TunnelServer;
-import frc.team88.tunnel.TunnelClient;
+
 
 public class ROSInterface implements TunnelInterface {
     protected ChassisInterface chassis;
@@ -163,12 +155,12 @@ public class ROSInterface implements TunnelInterface {
      * Setters for sending data to the coprocessor
      */
     
-    public void sendGoal(String waypointName, boolean is_continuous, boolean ignore_orientation) {
+    public void sendGoal(Waypoint waypoint) {
         if (num_sent_goals == 0) {
-            is_continuous = false;
+            waypoint.is_continuous = false;
             System.out.println("First goal must be discontinuous. Setting waypoint to discontinuous");
         }
-        TunnelServer.writePacket("goal", waypointName, is_continuous, ignore_orientation);
+        TunnelServer.writePacket("goal", waypoint.waypoint_name, waypoint.is_continuous, waypoint.ignore_orientation, waypoint.intermediate_tolerance);
         num_sent_goals++;
     }
 

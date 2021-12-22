@@ -20,12 +20,9 @@ public class DiffyTunnelInterface extends ROSInterface {
         this.swerve = swerve;
 
         plan = new WaypointsPlan(this);
-        plan.addWaypoint(new Waypoint("goal1"));
-        plan.addWaypoint(new Waypoint("goal2").makeContinuous(true));
-        plan.addWaypoint(new Waypoint("goal3").makeContinuous(true));
-        plan.addWaypoint(new Waypoint("goal4"));
-        plan.addWaypoint(new Waypoint("goal5"));
-        plan.addWaypoint(new Waypoint("goal1").makeIgnoreOrientation(false));
+        plan.addWaypoint(new Waypoint("start").makeIgnoreOrientation(true));
+        plan.addWaypoint(new Waypoint("point1").makeIgnoreOrientation(true));
+        plan.addWaypoint(new Waypoint("end").makeIgnoreOrientation(true));
     }
 
     @Override
@@ -34,7 +31,7 @@ public class DiffyTunnelInterface extends ROSInterface {
 
         String category = result.getCategory();
 
-        if (category.equals("general")) {
+        if (category.equals("debug")) {
             int general_cmd = (int) result.get(0);
             switch (general_cmd) {
                 case 1:
@@ -42,6 +39,7 @@ public class DiffyTunnelInterface extends ROSInterface {
                     break;
                 case 2:
                     this.swerve.resetImu();
+                    break;
                 default:
                     break;
             }

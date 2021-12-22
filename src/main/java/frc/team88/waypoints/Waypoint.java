@@ -27,6 +27,7 @@ public class Waypoint {
         this.waypoint_name = other.waypoint_name;
         this.is_continuous = other.is_continuous;
         this.ignore_orientation = other.ignore_orientation;
+        this.intermediate_tolerance = other.intermediate_tolerance;
     }
 
     public Waypoint makeWithTolerance(double intermediate_tolerance) {
