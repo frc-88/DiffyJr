@@ -299,10 +299,11 @@ public class TunnelProtocol {
         }
         result.setCategory(category);
 
-        result.setBuffer(buffer);
-        result.setStart(this.read_buffer_index + 1);
+        // read_buffer_index is currently the next index after category separator (\t)
+        result.setStart(this.read_buffer_index);
         result.setStop(checksum_start + 1);
 
+        result.setBuffer(buffer);
         result.setErrorCode(NO_ERROR);
         read_packet_num++;
         
