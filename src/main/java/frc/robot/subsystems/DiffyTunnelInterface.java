@@ -32,7 +32,7 @@ public class DiffyTunnelInterface extends ROSInterface {
         String category = result.getCategory();
 
         if (category.equals("debug")) {
-            int general_cmd = (int) result.get(0);
+            int general_cmd = result.getInt();
             switch (general_cmd) {
                 case 1:
                     plan.sendWaypoints();

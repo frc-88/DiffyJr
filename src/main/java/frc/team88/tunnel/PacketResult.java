@@ -1,12 +1,16 @@
 package frc.team88.tunnel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class PacketResult {
     private String category = "";
     private int error_code = 0;
     private long recv_time = 0;
-    private ArrayList<Object> data = new ArrayList<Object>();
+    private byte[] buffer;
+    private int start_index;
+    private int stop_index;
+    private int current_index;
 
     public PacketResult()
     {
@@ -40,13 +44,49 @@ public class PacketResult {
     public long getRecvTime() {
         return this.recv_time;
     }
-    public int size() {
-        return data.size();
+    public void setBuffer(byte[] buffer) {
+        this.buffer = buffer;
     }
-    public Object get(int index) {
-        return data.get(index);
+    public void setStart(int index) {
+        this.start_index = index;
+        this.current_index = this.start_index;
     }
-    public void add(Object obj) {
-        data.add(obj);
+    public void setStop(int index) {
+        this.stop_index = index;
+    }
+
+    private void checkIndex() {
+        if (this.current_index >= this.stop_index) {
+            throw new RuntimeException(
+                String.format("Index exceeds buffer limits. %d >= %d", this.current_index, this.stop_index));
+        }
+    }
+
+    public int getInt() {
+        int next_index = this.current_index + 4;
+        int result = TunnelUtil.toInt(Arrays.copyOfRange(buffer, this.current_index, next_index));
+        this.current_index = next_index;
+        checkIndex();
+        return result;
+    }
+    public double getDouble() {
+        int next_index = this.current_index + 8;
+        double result = TunnelUtil.toDouble(Arrays.copyOfRange(buffer, this.current_index, next_index));
+        this.current_index = next_index;
+        checkIndex();
+        return result;
+    }
+    public String getString() {
+        int next_index = this.current_index + 2;
+        short length = TunnelUtil.toShort(Arrays.copyOfRange(buffer, this.current_index, next_index));
+        this.current_index = next_index;
+        return getString(length);
+    }
+    public String getString(int length) {
+        int next_index = this.current_index + length;
+        String result = Arrays.toString(Arrays.copyOfRange(buffer, this.current_index, next_index));
+        this.current_index = next_index;
+        checkIndex();
+        return result;
     }
 }

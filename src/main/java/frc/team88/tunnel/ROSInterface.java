@@ -37,47 +37,31 @@ public class ROSInterface implements TunnelInterface {
     }
 
     @Override
-    public HashMap<String, String> getCategories() {
-        return new HashMap<String, String>() {
-            private static final long serialVersionUID = 1L;
-            {
-                put("cmd", "fffd");
-                put("global", "fff");
-                put("obj", "ddff");
-                put("gstatus", "d");
-                put("ping", "f");
-                put("reset", "fff");
-                put("general", "d");
-            }
-        };
-    }
-
-    @Override
     public void packetCallback(TunnelClient tunnel, PacketResult result) {
         String category = result.getCategory();
 
         if (category.equals("cmd")) {
             // Velocity commands sent by the coprocessor
-            command.vx = (double) result.get(0);
-            command.vy = (double) result.get(1);
-            command.vt = (double) result.get(2);
-            command.fieldRelative = ((int) result.get(3)) == 1;
+            command.vx = result.getDouble();
+            command.vy = result.getDouble();
+            command.vt = result.getDouble();
+            command.fieldRelative = result.getInt() == 1;
             commandTimer.setTunnelClient(tunnel);
             commandTimer.reset();
         }
         else if (category.equals("global")) {
             // Global position as declared by the coprocessor
             globalPose = new Pose2d(
-                (double) result.get(0),
-                (double) result.get(1),
-                new Rotation2d((double) result.get(2))
+                result.getDouble(),
+                result.getDouble(),
+                new Rotation2d(result.getDouble())
             );
             globalPoseTimer.setTunnelClient(tunnel);
             globalPoseTimer.reset();
         }
         else if (category.equals("obj")) {
             // Game objects the coprocessor sees
-            int index = (int) result.get(0);
+            int index = result.getInt();
             if (index < 0 || index >= maxNumGameObjects) {
                 System.out.println("Invalid game object index: " + index);
                 return;
@@ -85,26 +69,26 @@ public class ROSInterface implements TunnelInterface {
             gameObjects[index] = new GameObject(
                 result.getRecvTime(),
                 index,
-                (int) result.get(1),
-                (double) result.get(2),
-                (double) result.get(3)
+                result.getInt(),
+                result.getDouble(),
+                result.getDouble()
             );
         }
         else if (category.equals("gstatus")) {
             // move_base goal status
-            int status = (int) result.get(0);
+            int status = result.getInt();
             goalStatus = GoalStatus.getStatus(status);
             
             goalStatusTimer.setTunnelClient(tunnel);
             goalStatusTimer.reset();
         }
         else if (category.equals("ping")) {
-            tunnel.writePacket("ping", (double) result.get(0));
+            tunnel.writePacket("ping", result.getDouble());
         }
         else if (category.equals("reset")) {
-            double x = (double) result.get(0);
-            double y = (double) result.get(1);
-            double theta = (double) result.get(2);
+            double x = result.getDouble();
+            double y = result.getDouble();
+            double theta = result.getDouble();
             this.chassis.resetOdom(new Pose2d(new Translation2d(x, y), new Rotation2d(theta)));
         }
     }

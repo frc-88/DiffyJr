@@ -29,7 +29,7 @@ public class TunnelClient extends Thread {
         this.socket = clientSocket;
         this.tunnel_interface = tunnel_interface;
 
-        protocol = new TunnelProtocol(tunnel_interface.getCategories());
+        protocol = new TunnelProtocol();
 
         System.out.println("Opening client");
         try {

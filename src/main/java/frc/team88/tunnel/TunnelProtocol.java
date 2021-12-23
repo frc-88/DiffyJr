@@ -44,12 +44,11 @@ public class TunnelProtocol {
 
     private byte[] current_segment;
     
-    private Map<String, String> categories;
     private ArrayList<PacketResult> resultQueue = new ArrayList<PacketResult>();
 
-    public TunnelProtocol(HashMap<String, String> categories)
+    public TunnelProtocol()
     {
-        this.categories = categories;
+        
     }
 
     public byte[] makePacket(String category, Object... args)
@@ -240,11 +239,12 @@ public class TunnelProtocol {
             read_packet_num++;
             return new PacketResult(PACKET_STOP_ERROR, recv_time);
         }
-        byte calc_checksum = calculateChecksum(Arrays.copyOfRange(buffer, LENGTH_START_INDEX + LENGTH_BYTE_LENGTH, buffer.length - 3));
+        int checksum_start = buffer.length - 3;
+        byte calc_checksum = calculateChecksum(Arrays.copyOfRange(buffer, LENGTH_START_INDEX + LENGTH_BYTE_LENGTH, checksum_start));
 
         byte recv_checksum;
         try {
-            recv_checksum = TunnelUtil.hexToByte(new String(Arrays.copyOfRange(buffer, buffer.length - 3, buffer.length - 1)));
+            recv_checksum = TunnelUtil.hexToByte(new String(Arrays.copyOfRange(buffer, checksum_start, buffer.length - 1)));
         }
         catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -299,30 +299,10 @@ public class TunnelProtocol {
         }
         result.setCategory(category);
 
-        if (!this.categories.containsKey(category)) {
-            System.out.println(String.format(
-                "'%s' is not a recognized category: %s",
-                category,
-                TunnelUtil.packetToString(buffer))
-            );
-            read_packet_num++;
-            return new PacketResult(PACKET_CATEGORY_ERROR, recv_time);
-        }
+        result.setBuffer(buffer);
+        result.setStart(this.read_buffer_index + 1);
+        result.setStop(checksum_start + 1);
 
-        String packet_format = this.categories.get(category);
-
-        for (int format_index = 0; format_index < packet_format.length(); format_index++)
-        {
-            if (!parseNextSegment(buffer, packet_format.charAt(format_index), result)) {
-                System.out.println(String.format(
-                    "Failed to parse segment #%d. Buffer: %s",
-                    format_index,
-                    TunnelUtil.packetToString(buffer))
-                );
-                read_packet_num++;
-                return new PacketResult(INVALID_FORMAT_ERROR, recv_time);
-            }
-        }
         result.setErrorCode(NO_ERROR);
         read_packet_num++;
         
@@ -370,36 +350,6 @@ public class TunnelProtocol {
         return true;
     }
 
-    private boolean parseNextSegment(byte[] buffer, char format, PacketResult result) {
-        int length;
-        if (format == 'd' || format == 'u') {
-            length = 4;
-        }
-        else if (format == 'f') {
-            length = 8;
-        }
-        else {
-            length = -1;
-        }
-        if (!getNextSegment(buffer, length)) {
-            return false;
-        }
-
-        if (format == 'd' || format == 'u') {
-            result.add(TunnelUtil.toInt(this.current_segment));
-        }
-        else if (format == 's' || format == 'x') {
-            result.add(Arrays.toString(this.current_segment));
-        }
-        else if (format == 'f') {
-            result.add(TunnelUtil.toDouble(this.current_segment));
-        }
-        else {
-            System.out.println(String.format("Failed to parse segment '%s' as '%c'", TunnelUtil.packetToString(this.current_segment), format));
-        }
-        return true;
-    }
-
     public PacketResult popResult() {
         if (resultQueue.size() <= 0) {
             return new PacketResult(NULL_ERROR, 0);
@@ -410,12 +360,7 @@ public class TunnelProtocol {
     }
 
     public static void main(String[] args) {
-        TunnelProtocol protocol = new TunnelProtocol(new HashMap<String, String>(){
-            private static final long serialVersionUID = 1L; {
-            put("ping", "f");
-            put("cmd", "fff");
-        }});
-
+        TunnelProtocol protocol = new TunnelProtocol();
         
         byte[] packet = protocol.makePacket("ping", 4.0);
         String packet_str = TunnelUtil.packetToString(packet);
@@ -424,9 +369,7 @@ public class TunnelProtocol {
         PacketResult result = protocol.popResult();
         System.out.println("Error code: " + result.getErrorCode());
         System.out.println("Category: " + result.getCategory());
-        for (int index = 0; index < result.size(); index++) {
-            System.out.println(String.format("Data[%d]: %s", index, result.get(index)));
-        }
+        System.out.println(String.format("Data: %f", result.getDouble()));
 
         packet = protocol.makePacket("cmd", 5.3, 2.1, -6.6);
         packet_str = TunnelUtil.packetToString(packet);
@@ -435,9 +378,9 @@ public class TunnelProtocol {
         result = protocol.popResult();
         System.out.println("Error code: " + result.getErrorCode());
         System.out.println("Category: " + result.getCategory());
-        for (int index = 0; index < result.size(); index++) {
-            System.out.println(String.format("Data[%d]: %s", index, result.get(index)));
-        }
+        System.out.println(String.format("1: %f", result.getDouble()));
+        System.out.println(String.format("2: %f", result.getDouble()));
+        System.out.println(String.format("3: %f", result.getDouble()));
 
         // packet_str = TunnelUtil.packetToString(protocol.makePacket("something", 50.0, 10, "else"));
         // System.out.println(packet_str);
