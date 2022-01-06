@@ -140,11 +140,15 @@ public class ROSInterface implements TunnelInterface {
      */
     
     public void sendGoal(Waypoint waypoint) {
-        if (num_sent_goals == 0) {
-            waypoint.is_continuous = false;
-            System.out.println("First goal must be discontinuous. Setting waypoint to discontinuous");
-        }
-        TunnelServer.writePacket("goal", waypoint.waypoint_name, waypoint.is_continuous, waypoint.ignore_orientation, waypoint.intermediate_tolerance);
+        TunnelServer.writePacket(
+            "goal",
+            waypoint.waypoint_name,
+            waypoint.is_continuous,
+            waypoint.ignore_orientation,
+            waypoint.intermediate_tolerance,
+            waypoint.ignore_obstacles,
+            waypoint.ignore_walls
+        );
         num_sent_goals++;
     }
 

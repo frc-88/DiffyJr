@@ -20,9 +20,10 @@ public class DiffyTunnelInterface extends ROSInterface {
         this.swerve = swerve;
 
         plan = new WaypointsPlan(this);
-        plan.addWaypoint(new Waypoint("start").makeIgnoreOrientation(true));
-        plan.addWaypoint(new Waypoint("point1").makeIgnoreOrientation(true));
-        plan.addWaypoint(new Waypoint("end").makeIgnoreOrientation(true));
+        plan.addWaypoint(new Waypoint("point2").makeIgnoreWalls(true));
+        plan.addWaypoint(new Waypoint("start"));
+        plan.addWaypoint(new Waypoint("point1").makeContinuous(true));
+        plan.addWaypoint(new Waypoint("end"));
     }
 
     @Override
