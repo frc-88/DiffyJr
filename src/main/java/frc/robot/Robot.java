@@ -173,7 +173,7 @@ public class Robot extends TimedRobot {
                     vt = 0.0;
                 }
             }
-            swerve.drive(vx, vy, vt, false);
+            swerve.drive(vx, vy, vt);
         }
         else {
             this.swerve.holdDirection();

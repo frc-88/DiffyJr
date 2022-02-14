@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 
 public interface ChassisInterface {
     public void drive(VelocityCommand command);
-    public void drive(double vx, double vy, double angularVelocity, boolean fieldRelative);
+    public void drive(double vx, double vy, double angularVelocity);
     public void holdDirection();
     public void resetOdom(Pose2d pose);
     public Pose2d getOdometryPose();

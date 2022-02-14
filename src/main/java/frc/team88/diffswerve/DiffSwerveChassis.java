@@ -208,7 +208,7 @@ public class DiffSwerveChassis implements ChassisInterface {
     }
 
     public void drive(VelocityCommand command) {
-        drive(command.vx, command.vy, command.vt, command.fieldRelative);
+        drive(command.vx, command.vy, command.vt);
     }
 
     /**
@@ -217,9 +217,8 @@ public class DiffSwerveChassis implements ChassisInterface {
      * @param vx velocity in x direction
      * @param vy velocity in y direction
      * @param angularVelocity angular velocity (rotating speed)
-     * @param fieldRelative forward is always forward no mater orientation of robot.
      */
-    public void drive(double vx, double vy, double angularVelocity, boolean fieldRelative) {
+    public void drive(double vx, double vy, double angularVelocity) {
         if (Math.abs(vx) < Constants.DriveTrain.DEADBAND
                 && Math.abs(vy) < Constants.DriveTrain.DEADBAND
                 && Math.abs(angularVelocity) < Constants.DriveTrain.DEADBAND) {
@@ -228,7 +227,7 @@ public class DiffSwerveChassis implements ChassisInterface {
         }
         else if (!angleControllerEnabled || Math.abs(angularVelocity) > 0) {
             // if translation and rotation are significant, push setpoints as-is
-            ChassisSpeeds chassisSpeeds = getChassisSpeeds(vx, vy, angularVelocity, fieldRelative, getImuHeading());
+            ChassisSpeeds chassisSpeeds = getChassisSpeeds(vx, vy, angularVelocity, false, getImuHeading());
             SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(chassisSpeeds);
             SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, Constants.DriveTrain.MAX_CHASSIS_SPEED);
             setIdealState(swerveModuleStates);
@@ -237,7 +236,7 @@ public class DiffSwerveChassis implements ChassisInterface {
         else {
             // if only translation is significant, set angular velocity according to previous angle setpoint
             double controllerAngVel = angleController.calculate(getImuHeading().getRadians(), angleSetpoint);
-            ChassisSpeeds chassisSpeeds = getChassisSpeeds(vx, vy, controllerAngVel, fieldRelative, new Rotation2d(angleSetpoint));
+            ChassisSpeeds chassisSpeeds = getChassisSpeeds(vx, vy, controllerAngVel, false, new Rotation2d(angleSetpoint));
             SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(chassisSpeeds);
             SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, Constants.DriveTrain.MAX_CHASSIS_SPEED);
             setIdealState(swerveModuleStates);

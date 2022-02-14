@@ -45,7 +45,6 @@ public class ROSInterface implements TunnelInterface {
             command.vx = result.getDouble();
             command.vy = result.getDouble();
             command.vt = result.getDouble();
-            command.fieldRelative = result.getInt() == 1;
             commandTimer.setTunnelClient(tunnel);
             commandTimer.reset();
         }
