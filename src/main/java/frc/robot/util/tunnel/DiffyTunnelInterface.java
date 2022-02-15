@@ -1,27 +1,15 @@
-package frc.robot.subsystems;
+package frc.robot.util.tunnel;
 
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
-import frc.team88.chassis.ChassisInterface;
 import frc.team88.diffswerve.DiffSwerveChassis;
 import frc.team88.diffswerve.DiffSwerveModule;
-import frc.team88.tunnel.ROSInterface;
-import frc.team88.tunnel.TunnelServer;
-import frc.team88.waypoints.Waypoint;
-import frc.team88.waypoints.WaypointsPlan;
 
 public class DiffyTunnelInterface extends ROSInterface {
-    private WaypointsPlan plan;
     private DiffSwerveChassis swerve;
 
     public DiffyTunnelInterface(DiffSwerveChassis swerve) {
         super((ChassisInterface)swerve);
         this.swerve = swerve;
-
-        plan = new WaypointsPlan(this);
-        plan.addWaypoint(new Waypoint("point2").makeIgnoreWalls(true));
-        plan.addWaypoint(new Waypoint("start"));
-        plan.addWaypoint(new Waypoint("point1").makeContinuous(true));
-        plan.addWaypoint(new Waypoint("end"));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package frc.team88.waypoints;
+package frc.robot.util.roswaypoints;
 
 public enum GoalStatus {
     IDLE(0),

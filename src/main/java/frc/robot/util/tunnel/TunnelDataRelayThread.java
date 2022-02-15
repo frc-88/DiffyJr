@@ -1,4 +1,4 @@
-package frc.team88.tunnel;
+package frc.robot.util.tunnel;
 
 public class TunnelDataRelayThread extends Thread {
     private TunnelInterface tunnel_interface;
@@ -12,8 +12,8 @@ public class TunnelDataRelayThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            tunnel_interface.update();
             try {
+                tunnel_interface.update();
                 Thread.sleep(delay_ms);
             } catch (InterruptedException e) {
                 e.printStackTrace();

@@ -1,8 +1,8 @@
-package frc.team88.waypoints;
+package frc.robot.util.roswaypoints;
 
 import java.util.ArrayList;
 
-import frc.team88.tunnel.ROSInterface;
+import frc.robot.util.tunnel.ROSInterface;
 
 public class WaypointsPlan {
     private ArrayList<Waypoint> waypoints = new ArrayList<>();

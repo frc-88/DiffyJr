@@ -9,17 +9,20 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-
-import frc.team88.waypoints.commands.WaitForCoprocessorPlan;
-import frc.team88.waypoints.commands.WaitForCoprocessorRunning;
-import frc.robot.subsystems.DiffyTunnelInterface;
+import frc.robot.commands.ros.SendCoprocessorGoals;
+import frc.robot.commands.ros.WaitForCoprocessorPlan;
+import frc.robot.commands.ros.WaitForCoprocessorRunning;
 import frc.robot.subsystems.SwerveNetworkTable;
-import frc.team88.tunnel.TunnelServer;
+import frc.robot.util.roswaypoints.Waypoint;
+import frc.robot.util.roswaypoints.WaypointsPlan;
+import frc.robot.util.tunnel.DiffyTunnelInterface;
+import frc.robot.util.tunnel.TunnelServer;
 import frc.team88.diffswerve.Constants;
 import frc.team88.diffswerve.DiffSwerveChassis;
 import frc.team88.diffswerve.Helpers;
@@ -38,10 +41,20 @@ public class Robot extends TimedRobot {
     private SwerveNetworkTable swerve_table;
     private CommandBase autoCommand;
 
+    private static final int BUTTON_A = 5;
+    private static final int BUTTON_B = 2;
+    private static final int BUTTON_X = 3;
+    private static final int BUTTON_Y = 4;
+
     private Joystick gamepad;
+    private JoystickButton autoCommandButton = new JoystickButton(gamepad, BUTTON_B);
+    private JoystickButton pursueButton = new JoystickButton(gamepad, BUTTON_A);
     private final int GAMEPAD_PORT = 0;
     private final double JOYSTICK_DEADBAND = 0.1;
     
+    WaypointsPlan autoPlan;
+    WaypointsPlan pursuePlan;
+
     @Override
     public void robotInit() {
         this.swerve = new DiffSwerveChassis();
@@ -52,10 +65,26 @@ public class Robot extends TimedRobot {
         
         tunnel.start();
 
+        autoPlan = new WaypointsPlan(diffy_interface);
+        autoPlan.addWaypoint(new Waypoint("start").makeIgnoreWalls(true));
+        autoPlan.addWaypoint(new Waypoint("point1").makeContinuous(true));
+        autoPlan.addWaypoint(new Waypoint("point2"));
+        autoPlan.addWaypoint(new Waypoint("power_cell"));
+        autoPlan.addWaypoint(new Waypoint("power_cell"));
+
+        pursuePlan = new WaypointsPlan(diffy_interface);
+        pursuePlan.addWaypoint(new Waypoint("power_cell"));
+
         swerve_table = new SwerveNetworkTable(swerve);
         this.gamepad = new Joystick(GAMEPAD_PORT);
 
         this.addPeriodic(this::controllerPeriodic, Constants.DifferentialSwerveModule.kDt, 0.0025);
+
+        autoCommandButton.whileActiveOnce(new SendCoprocessorGoals(autoPlan));
+        autoCommandButton.whileActiveOnce(new SequentialCommandGroup(
+            new SendCoprocessorGoals(pursuePlan),
+            getWaitForCoprocessorPlan(20.0)
+        ));
         
         TunnelServer.println("Diffy Jr is initialized");
     }
@@ -107,7 +136,7 @@ public class Robot extends TimedRobot {
         TunnelServer.println("Diffy Jr auto enabled");
         System.out.println("Diffy Jr auto enabled");
         swerve.setEnabled(true);
-        autoCommand = getWaitForCoprocessorPlan(30.0);
+        autoCommand = getWaitForCoprocessorPlan(15.0);
 
         // schedule the autonomous command
         if (autoCommand != null) {
@@ -125,6 +154,7 @@ public class Robot extends TimedRobot {
         TunnelServer.println("Diffy Jr teleop enabled");
         System.out.println("Diffy Jr teleop enabled");
         swerve.setEnabled(true);
+        diffy_interface.cancelGoal();
         if (autoCommand != null) {
             autoCommand.cancel();
         }

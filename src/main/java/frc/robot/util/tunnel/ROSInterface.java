@@ -1,17 +1,12 @@
-package frc.team88.tunnel;
-
-import java.util.HashMap;
+package frc.robot.util.tunnel;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 
-import frc.team88.chassis.ChassisInterface;
-import frc.team88.chassis.VelocityCommand;
-import frc.team88.gameobjects.GameObject;
-import frc.team88.waypoints.GoalStatus;
-import frc.team88.waypoints.Waypoint;
+import frc.robot.util.roswaypoints.GoalStatus;
+import frc.robot.util.roswaypoints.Waypoint;
 
 
 public class ROSInterface implements TunnelInterface {
@@ -24,9 +19,6 @@ public class ROSInterface implements TunnelInterface {
     protected VelocityCommand command = new VelocityCommand();
     
     protected Pose2d globalPose = new Pose2d();
-    
-    private final int maxNumGameObjects = 20;
-    protected final GameObject[] gameObjects = new GameObject[maxNumGameObjects];
     
     protected GoalStatus goalStatus = GoalStatus.INVALID;
 
@@ -58,21 +50,6 @@ public class ROSInterface implements TunnelInterface {
             globalPoseTimer.setTunnelClient(tunnel);
             globalPoseTimer.reset();
         }
-        else if (category.equals("obj")) {
-            // Game objects the coprocessor sees
-            int index = result.getInt();
-            if (index < 0 || index >= maxNumGameObjects) {
-                System.out.println("Invalid game object index: " + index);
-                return;
-            }
-            gameObjects[index] = new GameObject(
-                result.getRecvTime(),
-                index,
-                result.getInt(),
-                result.getDouble(),
-                result.getDouble()
-            );
-        }
         else if (category.equals("gstatus")) {
             // move_base goal status
             int status = result.getInt();
@@ -88,7 +65,7 @@ public class ROSInterface implements TunnelInterface {
             double x = result.getDouble();
             double y = result.getDouble();
             double theta = result.getDouble();
-            this.chassis.resetOdom(new Pose2d(new Translation2d(x, y), new Rotation2d(theta)));
+            this.chassis.resetPosition(new Pose2d(new Translation2d(x, y), new Rotation2d(theta)));
         }
     }
 
@@ -120,10 +97,6 @@ public class ROSInterface implements TunnelInterface {
 
     public boolean isGlobalPoseActive() {
         return globalPoseTimer.isActive();
-    }
-
-    public GameObject[] getGameObjects() {
-        return gameObjects;
     }
 
     public GoalStatus getGoalStatus() {

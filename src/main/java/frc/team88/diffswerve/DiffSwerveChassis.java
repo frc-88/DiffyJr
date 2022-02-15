@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import frc.team88.chassis.ChassisInterface;
-import frc.team88.chassis.VelocityCommand;
+import frc.robot.util.tunnel.ChassisInterface;
+import frc.robot.util.tunnel.VelocityCommand;
 
 
 public class DiffSwerveChassis implements ChassisInterface {
@@ -248,5 +248,15 @@ public class DiffSwerveChassis implements ChassisInterface {
         SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(adjustedSpeeds);
         SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, Constants.DriveTrain.MAX_CHASSIS_SPEED);
         setIdealState(moduleStates);
+    }
+
+    @Override
+    public void stop() {
+        holdDirection();
+    }
+
+    @Override
+    public void resetPosition(Pose2d pose) {
+        resetOdom(pose);
     }
 }
